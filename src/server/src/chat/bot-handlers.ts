@@ -1,10 +1,10 @@
-import { BaseBotHandler, GetActiveUsersCallback, SendBotMessageCallback } from './interfaces';
+import { BotIdEnum, UserStatusEnum } from '@shared';
 import { getRandomElement, getRandomInt } from '../utils/random.utils';
-import { BotId, UserStatus } from './enums';
+import { BaseBotHandler, GetActiveUsersCallback, SendBotMessageCallback } from './base-bot-handler';
 
 export class EchoBotHandler extends BaseBotHandler {
   constructor() {
-    super(BotId.ECHO, 'Echo Bot', 'echo');
+    super(BotIdEnum.ECHO, 'Echo Bot', 'echo');
   }
 
   handle(targetUserId: string, text: string, sendCallback: SendBotMessageCallback): void {
@@ -16,7 +16,7 @@ export class ReverseBotHandler extends BaseBotHandler {
   private readonly DELAY_MS = 3000;
 
   constructor() {
-    super(BotId.REVERSE, 'Reverse Bot', 'reverse');
+    super(BotIdEnum.REVERSE, 'Reverse Bot', 'reverse');
   }
 
   handle(targetUserId: string, text: string, sendCallback: SendBotMessageCallback): void {
@@ -29,7 +29,7 @@ export class ReverseBotHandler extends BaseBotHandler {
 
 export class IgnoreBotHandler extends BaseBotHandler {
   constructor() {
-    super(BotId.IGNORE, 'Ignore Bot', 'ignore');
+    super(BotIdEnum.IGNORE, 'Ignore Bot', 'ignore');
   }
 
   handle(): void {}
@@ -49,7 +49,7 @@ export class SpamBotHandler extends BaseBotHandler {
   private spamTimeout: NodeJS.Timeout | null = null;
 
   constructor() {
-    super(BotId.SPAM, 'Spam Bot', 'spam');
+    super(BotIdEnum.SPAM, 'Spam Bot', 'spam');
   }
 
   handle(): void {}
@@ -60,7 +60,7 @@ export class SpamBotHandler extends BaseBotHandler {
 
       this.spamTimeout = setTimeout(() => {
         const activeUsers = getUsersCallback().filter(
-          (u) => !u.isBot && u.status === UserStatus.ONLINE
+          (u) => !u.isBot && u.status === UserStatusEnum.ONLINE
         );
 
         if (activeUsers.length > 0) {

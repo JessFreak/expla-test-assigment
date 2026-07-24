@@ -1,10 +1,9 @@
-import { User } from '../interfaces';
-import { UserStatus } from '../enums';
+import { IUser, UserStatusEnum } from '@shared';
 export type SendBotMessageCallback = (botId: string, receiverId: string, text: string) => void;
-export type GetActiveUsersCallback = () => User[];
+export type GetActiveUsersCallback = () => IUser[];
 
 export abstract class BaseBotHandler {
-  readonly profile: User;
+  readonly profile: IUser;
 
   protected constructor(id: string, name: string, seed: string) {
     this.profile = {
@@ -12,7 +11,7 @@ export abstract class BaseBotHandler {
       name,
       avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}`,
       isBot: true,
-      status: UserStatus.ONLINE,
+      status: UserStatusEnum.ONLINE,
     };
   }
 

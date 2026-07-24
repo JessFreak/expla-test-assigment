@@ -1,6 +1,7 @@
 import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IConnectQuery } from '@shared';
 
-export class ConnectQueryDto {
+export class ConnectQueryDto implements IConnectQuery {
   @IsString()
   @IsNotEmpty()
   id: string;

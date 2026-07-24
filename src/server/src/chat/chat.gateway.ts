@@ -11,8 +11,8 @@ import {
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
-import { ConnectQueryDto, GetHistoryDto, SendMessageDto } from './dtos';
-import { SocketEvent, UserStatus } from './enums';
+import { SocketEventEnum, UserStatusEnum } from '@shared';
+import { ConnectQueryDto, GetHistoryDto, SendMessageDto } from './dtos'
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 
@@ -45,7 +45,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       name: queryDto.name,
       avatar: queryDto.avatar,
       isBot: false,
-      status: UserStatus.ONLINE,
+      status: UserStatusEnum.ONLINE,
     });
 
     // сповістити всіх
@@ -62,7 +62,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @UsePipes(new ValidationPipe({ transform: true }))
-  @SubscribeMessage(SocketEvent.SEND_MESSAGE)
+  @SubscribeMessage(SocketEventEnum.SEND_MESSAGE)
   handleSendMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody() body: SendMessageDto,
@@ -71,12 +71,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const msg = this.chatService.addMessage(senderId, body);
 
     if (msg) {
-      this.server.emit(SocketEvent.MESSAGE_RECEIVED, msg);
+      this.server.emit(SocketEventEnum.MESSAGE_RECEIVED, msg);
     }
   }
 
   @UsePipes(new ValidationPipe({ transform: true }))
-  @SubscribeMessage(SocketEvent.GET_HISTORY)
+  @SubscribeMessage(SocketEventEnum.GET_HISTORY)
   handleGetHistory(
     @ConnectedSocket() client: Socket,
     @MessageBody() body: GetHistoryDto,
@@ -84,10 +84,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const senderId = client.handshake.query.id as string;
     const history = this.chatService.getMessagesBetween(senderId, body.withUserId);
 
-    client.emit(SocketEvent.HISTORY_LIST, history);
+    client.emit(SocketEventEnum.HISTORY_LIST, history);
   }
 
   private broadcastUsers() {
-    this.server.emit(SocketEvent.USERS_LIST, this.chatService.getUsers());
+    this.server.emit(SocketEventEnum.USERS_LIST, this.chatService.getUsers());
   }
 }

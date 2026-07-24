@@ -1,4 +1,4 @@
-export enum SocketEvent {
+export enum SocketEventEnum {
   SEND_MESSAGE = 'sendMessage',
   GET_HISTORY = 'getHistory',
   MESSAGE_RECEIVED = 'messageReceived',

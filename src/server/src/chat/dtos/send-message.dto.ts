@@ -1,7 +1,8 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { ISendMessage } from '@shared';
 
-export class SendMessageDto {
+export class SendMessageDto implements ISendMessage {
   @IsString()
   @IsNotEmpty()
   receiverId: string;

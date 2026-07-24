@@ -1,4 +1,4 @@
-export enum BotId {
+export enum BotIdEnum {
   ECHO = 'bot-echo',
   REVERSE = 'bot-reverse',
   SPAM = 'bot-spam',
