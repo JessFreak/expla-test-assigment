@@ -8,7 +8,7 @@ import {
   OnGatewayDisconnect,
   OnGatewayInit,
 } from '@nestjs/websockets';
-import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { SocketEventEnum, UserStatusEnum } from '@shared';
@@ -29,16 +29,22 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   afterInit(server: Server) {
     this.chatService.setServer(server);
+
+    server.use(async (socket, next) => {
+      const dto = plainToInstance(ConnectQueryDto, socket.handshake.query);
+      const errors = await validate(dto);
+
+      if (errors.length > 0) {
+        return next(new BadRequestException('Unauthorized / Invalid query params'));
+      }
+
+      socket.data.user = dto;
+      next();
+    });
   }
 
-  async handleConnection(client: Socket) {
-    const queryDto = plainToInstance(ConnectQueryDto, client.handshake.query);
-    const errors = await validate(queryDto);
-
-    if (errors.length > 0) {
-      client.disconnect();
-      return;
-    }
+  handleConnection(client: Socket) {
+    const queryDto: ConnectQueryDto = client.data.user;
 
     this.chatService.addUser({
       id: queryDto.id,
@@ -48,7 +54,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       status: UserStatusEnum.ONLINE,
     });
 
-    // сповістити всіх
     this.broadcastUsers();
   }
 
