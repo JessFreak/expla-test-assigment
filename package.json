@@ -1,0 +1,26 @@
+{
+  "name": "expla-test-assigment",
+  "version": "1.0.0",
+  "description": "The goal is to develop a \"Chat\" web application consisting of a client-side and a server-side.",
+  "homepage": "https://github.com/JessFreak/expla-test-assigment#readme",
+  "bugs": {
+    "url": "https://github.com/JessFreak/expla-test-assigment/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JessFreak/expla-test-assigment.git"
+  },
+  "license": "ISC",
+  "author": "JessFreak",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start:server": "npm run start:dev --prefix src/server",
+    "start:client": "npm run start --prefix src/client",
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"blue,green\" \"npm run start:server\" \"npm run start:client\"",
+    "install:all": "npm install --prefix src/server && npm install --prefix src/client"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3"
+  }
+}
