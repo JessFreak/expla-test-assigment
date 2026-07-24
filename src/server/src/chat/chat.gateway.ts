@@ -8,11 +8,13 @@ import {
   OnGatewayDisconnect,
   OnGatewayInit,
 } from '@nestjs/websockets';
+import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
-import { User } from './interfaces';
-import { UsePipes, ValidationPipe } from '@nestjs/common';
-import { GetHistoryDto, SendMessageDto } from './dtos';
+import { ConnectQueryDto, GetHistoryDto, SendMessageDto } from './dtos';
+import { SocketEvent, UserStatus } from './enums';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
 
 @WebSocketGateway({
   cors: {
@@ -29,24 +31,30 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.chatService.setServer(server);
   }
 
-  handleConnection(client: Socket) {
-    const userData = client.handshake.query as unknown as User;
-    if (userData && userData.id) {
-      this.chatService.addUser({
-        id: userData.id,
-        name: userData.name || 'Anonymous',
-        avatar: userData.avatar || '',
-        isBot: false,
-        status: 'online',
-      });
+  async handleConnection(client: Socket) {
+    const queryDto = plainToInstance(ConnectQueryDto, client.handshake.query);
+    const errors = await validate(queryDto);
 
-      // сповістити всіх
-      this.broadcastUsers();
+    if (errors.length > 0) {
+      client.disconnect();
+      return;
     }
+
+    this.chatService.addUser({
+      id: queryDto.id,
+      name: queryDto.name,
+      avatar: queryDto.avatar,
+      isBot: false,
+      status: UserStatus.ONLINE,
+    });
+
+    // сповістити всіх
+    this.broadcastUsers();
   }
 
   handleDisconnect(client: Socket) {
     const userId = client.handshake.query.id as string;
+
     if (userId) {
       this.chatService.setUserOffline(userId);
       this.broadcastUsers();
@@ -54,7 +62,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @UsePipes(new ValidationPipe({ transform: true }))
-  @SubscribeMessage('sendMessage')
+  @SubscribeMessage(SocketEvent.SEND_MESSAGE)
   handleSendMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody() body: SendMessageDto,
@@ -63,22 +71,23 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const msg = this.chatService.addMessage(senderId, body);
 
     if (msg) {
-      this.server.emit('messageReceived', msg);
+      this.server.emit(SocketEvent.MESSAGE_RECEIVED, msg);
     }
   }
 
   @UsePipes(new ValidationPipe({ transform: true }))
-  @SubscribeMessage('getHistory')
+  @SubscribeMessage(SocketEvent.GET_HISTORY)
   handleGetHistory(
     @ConnectedSocket() client: Socket,
     @MessageBody() body: GetHistoryDto,
   ) {
     const senderId = client.handshake.query.id as string;
     const history = this.chatService.getMessagesBetween(senderId, body.withUserId);
-    client.emit('history', history);
+
+    client.emit(SocketEvent.HISTORY_LIST, history);
   }
 
   private broadcastUsers() {
-    this.server.emit('users', this.chatService.getUsers());
+    this.server.emit(SocketEvent.USERS_LIST, this.chatService.getUsers());
   }
 }

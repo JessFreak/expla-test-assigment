@@ -1,8 +1,10 @@
 import { BaseBotHandler, GetActiveUsersCallback, SendBotMessageCallback } from './interfaces';
+import { getRandomElement, getRandomInt } from '../utils/random.utils';
+import { BotId, UserStatus } from './enums';
 
 export class EchoBotHandler extends BaseBotHandler {
   constructor() {
-    super('bot-echo', 'Echo Bot', 'echo');
+    super(BotId.ECHO, 'Echo Bot', 'echo');
   }
 
   handle(targetUserId: string, text: string, sendCallback: SendBotMessageCallback): void {
@@ -11,29 +13,32 @@ export class EchoBotHandler extends BaseBotHandler {
 }
 
 export class ReverseBotHandler extends BaseBotHandler {
+  private readonly DELAY_MS = 3000;
+
   constructor() {
-    super('bot-reverse', 'Reverse Bot', 'reverse');
+    super(BotId.REVERSE, 'Reverse Bot', 'reverse');
   }
 
   handle(targetUserId: string, text: string, sendCallback: SendBotMessageCallback): void {
     setTimeout(() => {
       const reversed = text.split('').reverse().join('');
       sendCallback(this.profile.id, targetUserId, reversed);
-    }, 3000);
+    }, this.DELAY_MS);
   }
 }
 
 export class IgnoreBotHandler extends BaseBotHandler {
   constructor() {
-    super('bot-ignore', 'Ignore Bot', 'ignore');
+    super(BotId.IGNORE, 'Ignore Bot', 'ignore');
   }
 
   handle(): void {}
 }
 
 export class SpamBotHandler extends BaseBotHandler {
-  private spamTimeout: NodeJS.Timeout | null = null;
-  private readonly spamPhrases = [
+  private readonly MIN_DELAY_MS = 10_000;
+  private readonly MAX_DELAY_MS = 120_000;
+  private readonly SPAM_PHRASES = [
     'Hi!',
     '5800x3d for 200$!',
     'Hello? Anyone here?',
@@ -41,23 +46,27 @@ export class SpamBotHandler extends BaseBotHandler {
     'HIRE ME!',
     'HELLO. HERE IS MY RESUME...'
   ];
+  private spamTimeout: NodeJS.Timeout | null = null;
 
   constructor() {
-    super('bot-spam', 'Spam Bot', 'spam');
+    super(BotId.SPAM, 'Spam Bot', 'spam');
   }
 
   handle(): void {}
 
   override start(sendCallback: SendBotMessageCallback, getUsersCallback: GetActiveUsersCallback): void {
     const scheduleNextSpam = () => {
-      const randomDelay = Math.floor(Math.random() * (120 - 10 + 1) + 10) * 1000;
+      const randomDelay = getRandomInt(this.MIN_DELAY_MS, this.MAX_DELAY_MS);
 
       this.spamTimeout = setTimeout(() => {
-        const activeUsers = getUsersCallback().filter((u) => !u.isBot && u.status === 'online');
+        const activeUsers = getUsersCallback().filter(
+          (u) => !u.isBot && u.status === UserStatus.ONLINE
+        );
 
         if (activeUsers.length > 0) {
-          const randomUser = activeUsers[Math.floor(Math.random() * activeUsers.length)];
-          const randomPhrase = this.spamPhrases[Math.floor(Math.random() * this.spamPhrases.length)];
+          const randomUser = getRandomElement(activeUsers);
+          const randomPhrase = getRandomElement(this.SPAM_PHRASES);
+
           sendCallback(this.profile.id, randomUser.id, randomPhrase);
         }
 

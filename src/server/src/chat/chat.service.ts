@@ -3,6 +3,8 @@ import { Server } from 'socket.io';
 import { BaseBotHandler, Message, User } from './interfaces';
 import { SendMessageDto } from './dtos';
 import { EchoBotHandler, IgnoreBotHandler, ReverseBotHandler, SpamBotHandler } from './bot-handlers';
+import { BotId, SocketEvent, UserStatus } from './enums';
+import { generateUniqueId } from '../utils/random.utils';
 
 @Injectable()
 export class ChatService implements OnModuleInit, OnModuleDestroy {
@@ -10,11 +12,11 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   private messages: Message[] = [];
   private server: Server;
 
-  private readonly botHandlers: Record<string, BaseBotHandler> = {
-    'bot-echo': new EchoBotHandler(),
-    'bot-reverse': new ReverseBotHandler(),
-    'bot-spam': new SpamBotHandler(),
-    'bot-ignore': new IgnoreBotHandler(),
+  private readonly botHandlers: Record<BotId, BaseBotHandler> = {
+    [BotId.ECHO]: new EchoBotHandler(),
+    [BotId.REVERSE]: new ReverseBotHandler(),
+    [BotId.SPAM]: new SpamBotHandler(),
+    [BotId.IGNORE]: new IgnoreBotHandler(),
   };
 
   onModuleInit() {
@@ -30,7 +32,6 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   setServer(server: Server) {
     this.server = server;
 
-    // запуск спаму
     Object.values(this.botHandlers).forEach((handler) => {
       handler.start?.(
         this.sendBotMessage.bind(this),
@@ -40,13 +41,13 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   }
 
   addUser(user: User): void {
-    this.users.set(user.id, { ...user, isBot: false, status: 'online' });
+    this.users.set(user.id, { ...user, isBot: false, status: UserStatus.ONLINE });
   }
 
   setUserOffline(userId: string) {
     const user = this.users.get(userId);
     if (user) {
-      user.status = 'offline';
+      user.status = UserStatus.OFFLINE;
     }
   }
 
@@ -56,7 +57,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
 
   addMessage(senderId: string, dto: SendMessageDto): Message {
     const msg: Message = {
-      id: `${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      id: generateUniqueId(),
       senderId,
       receiverId: dto.receiverId,
       text: dto.text,
@@ -77,7 +78,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   }
 
   private handleBotResponse(botId: string, targetUserId: string, text: string): void {
-    const handler = this.botHandlers[botId];
+    const handler = this.botHandlers[botId as BotId];
     if (handler) {
       handler.handle(targetUserId, text, this.sendBotMessage.bind(this));
     }
@@ -85,7 +86,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
 
   private sendBotMessage(botId: string, receiverId: string, text: string): void {
     const msg: Message = {
-      id: `${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      id: generateUniqueId(),
       senderId: botId,
       receiverId,
       text,
@@ -94,7 +95,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     this.messages.push(msg);
 
     if (this.server) {
-      this.server.emit('messageReceived', msg);
+      this.server.emit(SocketEvent.MESSAGE_RECEIVED, msg);
     }
   }
 }

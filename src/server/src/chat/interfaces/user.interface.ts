@@ -1,4 +1,4 @@
-export type UserStatus = 'online' | 'offline';
+import { UserStatus } from '../enums';
 
 export interface User {
     id: string;

@@ -1,5 +1,5 @@
 import { User } from '../interfaces';
-
+import { UserStatus } from '../enums';
 export type SendBotMessageCallback = (botId: string, receiverId: string, text: string) => void;
 export type GetActiveUsersCallback = () => User[];
 
@@ -12,7 +12,7 @@ export abstract class BaseBotHandler {
       name,
       avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}`,
       isBot: true,
-      status: 'online',
+      status: UserStatus.ONLINE,
     };
   }
 
