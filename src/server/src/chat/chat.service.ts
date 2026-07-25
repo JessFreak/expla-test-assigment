@@ -68,8 +68,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     this.handleBotResponse(dto.receiverId, senderId, dto.text);
     return msg;
   }
-
-  //TODO change to rooms
+  
   getMessagesBetween(user1Id: string, user2Id: string): IMessage[] {
     return this.messages.filter(
       (m) =>
@@ -96,7 +95,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     this.messages.push(msg);
 
     if (this.server) {
-      this.server.emit(SocketEventEnum.MESSAGE_RECEIVED, msg);
+      this.server.to(receiverId).emit(SocketEventEnum.MESSAGE_RECEIVED, msg);
     }
   }
 }

@@ -45,6 +45,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleConnection(client: Socket) {
     const queryDto: ConnectQueryDto = client.data.user;
 
+    client.join(queryDto.id);
+
     this.chatService.addUser({
       id: queryDto.id,
       name: queryDto.name,
@@ -70,12 +72,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @ConnectedSocket() client: Socket,
     @MessageBody() body: SendMessageDto,
   ) {
-    const senderId = client.handshake.query.id as string;
+    const senderId = client.data.user.id;
     const msg = this.chatService.addMessage(senderId, body);
 
-    //TODO CHANGE TO ROOMS.
     if (msg) {
-      this.server.emit(SocketEventEnum.MESSAGE_RECEIVED, msg);
+      this.server
+        .to([msg.receiverId, msg.senderId])
+        .emit(SocketEventEnum.MESSAGE_RECEIVED, msg);
     }
   }
 
@@ -84,7 +87,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @ConnectedSocket() client: Socket,
     @MessageBody() body: GetHistoryDto,
   ) {
-    const senderId = client.handshake.query.id as string;
+    const senderId = client.data.user.id;
     const history = this.chatService.getMessagesBetween(senderId, body.withUserId);
 
     client.emit(SocketEventEnum.HISTORY_LIST, history);
