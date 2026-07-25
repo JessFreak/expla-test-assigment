@@ -2,11 +2,12 @@ import { Component, EventEmitter, input, Output, signal } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IChatPreview, IGetUsersQuery, UserFilterEnum, UserStatusEnum } from '@shared';
+import { TimeAgoPipe } from '../../pipes/time-ago.pipe';
 
 @Component({
   selector: 'app-chat-sidebar',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgOptimizedImage],
+  imports: [CommonModule, FormsModule, NgOptimizedImage, TimeAgoPipe],
   templateUrl: './chat-sidebar.component.html',
   styleUrls: ['./chat-sidebar.component.scss'],
 })

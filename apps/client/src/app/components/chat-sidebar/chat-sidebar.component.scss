@@ -103,11 +103,24 @@
         flex: 1;
         min-width: 0;
 
-        .name {
-          font-size: 14px;
-          font-weight: 500;
-          color: var(--text-main);
-          text-overflow: ellipsis;
+        .top-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 8px;
+
+          .name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-main);
+          }
+
+          .time {
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            flex-shrink: 0;
+          }
         }
 
         .subtext {

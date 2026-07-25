@@ -38,6 +38,9 @@
                 <div class="info">
                     <div class="top-row">
                         <span class="name">{{ preview.user.name }}</span>
+                        @if (preview.lastMessageTimestamp) {
+                            <span class="time">{{ preview.lastMessageTimestamp | timeAgo }}</span>
+                        }
                     </div>
                     <span class="subtext">
                       {{ preview.lastMessageText || (preview.user.isBot ? 'Bot' : 'User') }}
