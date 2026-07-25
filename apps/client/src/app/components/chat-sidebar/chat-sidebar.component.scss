@@ -8,7 +8,7 @@
   border-right: 1px solid var(--border-input);
 
   .header {
-    padding: 24px 24px 24px;
+    padding: 24px 24px 20px;
     display: flex;
     justify-content: center;
     border-bottom: 1px solid var(--border-input);
@@ -24,15 +24,11 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 16px 24px 16px;
-    padding: 8px 12px;
-    background-color: var(--bg-app);
-    border: 1px solid var(--border-input);
-    border-radius: 10px;
+    margin: 16px 24px 12px;
+    padding: 0;
 
     svg {
-      color: #94a3b8;
-      flex-shrink: 0;
+      margin-left: 17px;
     }
 
     input {
@@ -56,6 +52,7 @@
     flex: 1;
 
     .empty-state {
+      padding: 12px;
       color: var(--text-muted);
     }
 
@@ -113,6 +110,9 @@
             font-size: 14px;
             font-weight: 500;
             color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
 
           .time {
@@ -136,24 +136,26 @@
 
   .tabs {
     display: flex;
-    gap: 6px;
-    padding: 12px;
-    margin-top: auto;
-    background-color: var(--bg-app);
-    border-top: 1px solid var(--border-input);
+    margin: 12px 24px 20px;
+    background-color: #FFFFFF;
+    border: 1px solid var(--border-input);
+    border-radius: 12px;
+    overflow: hidden;
 
     .tab-btn {
       flex: 1;
       padding: 10px 0;
       border: none;
-      border-radius: 8px;
       background: transparent;
       color: var(--text-muted);
-      font-weight: 400;
-      font-size: 14px;
-
+      font-weight: 500;
+      font-size: 13px;
       cursor: pointer;
       transition: all 0.15s ease;
+
+      &:first-child {
+        border-right: 1px solid var(--border-input);
+      }
 
       &.active {
         background-color: var(--bg-msg-outgoing);

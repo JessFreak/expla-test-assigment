@@ -92,34 +92,42 @@
   }
 
   .composer {
-    display: flex;
-    align-items: center;
-    gap: 12px;
     padding: 16px 24px;
 
-    .input {
-      flex: 1;
-      border: 1px solid var(--border-input);
-      border-radius: 16px;
-      padding: 12px 18px;
-      font-size: 14px;
-      outline: none;
-      background: transparent;
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
 
-      &::placeholder { color: var(--text-muted); }
-      &:focus { border-color: var(--bg-msg-outgoing); }
-    }
+      .input {
+        width: 100%;
+        border: 1px solid var(--border-input);
+        border-radius: 16px;
+        padding: 14px 48px 14px 18px;
+        font-size: 14px;
+        outline: none;
+        background: transparent;
 
-    .send-btn {
-      background: transparent;
-      border: none;
-      color: var(--bg-msg-outgoing);
-      cursor: pointer;
-      padding: 8px;
+        &::placeholder { color: var(--text-muted); }
+        &:focus { border-color: var(--bg-msg-outgoing); }
+      }
 
-      &:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
+      .send-btn {
+        position: absolute;
+        right: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+
+        &:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
       }
     }
   }
