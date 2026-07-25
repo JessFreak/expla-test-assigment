@@ -4,7 +4,7 @@ import { BaseBotHandler } from './base-bot-handler';
 import { BotIdEnum, IMessage, SocketEventEnum, IUser, UserStatusEnum } from '@shared';
 import { SendMessageDto } from './dtos';
 import { EchoBotHandler, IgnoreBotHandler, ReverseBotHandler, SpamBotHandler } from './bot-handlers';
-import { generateUniqueId } from '../utils/random.utils';
+import { generateUniqueId } from '@shared';
 
 @Injectable()
 export class ChatService implements OnModuleInit, OnModuleDestroy {

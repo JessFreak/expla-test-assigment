@@ -1,5 +1,5 @@
 import { BotIdEnum, UserStatusEnum } from '@shared';
-import { getRandomElement, getRandomInt } from '../utils/random.utils';
+import { getRandomElement, getRandomInt } from '@shared';
 import { BaseBotHandler, GetActiveUsersCallback, SendBotMessageCallback } from './base-bot-handler';
 
 const REVERSE_BOT_DELAY_MS = 3_000;
