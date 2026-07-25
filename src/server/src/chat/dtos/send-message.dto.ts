@@ -1,14 +1,14 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ISendMessage } from '@shared';
+import { trimString } from '../../utils/transform.utils';
 
 export class SendMessageDto implements ISendMessage {
   @IsString()
-  @IsNotEmpty()
   receiverId: string;
 
   @IsString()
+  @Transform(trimString)
   @IsNotEmpty()
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   text: string;
 }

@@ -69,6 +69,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     return msg;
   }
 
+  //TODO change to rooms
   getMessagesBetween(user1Id: string, user2Id: string): IMessage[] {
     return this.messages.filter(
       (m) =>

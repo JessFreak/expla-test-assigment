@@ -8,7 +8,6 @@ import {
   OnGatewayDisconnect,
   OnGatewayInit,
 } from '@nestjs/websockets';
-import { BadRequestException, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { SocketEventEnum, UserStatusEnum } from '@shared';
@@ -35,7 +34,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       const errors = await validate(dto);
 
       if (errors.length > 0) {
-        return next(new BadRequestException('Unauthorized / Invalid query params'));
+        return next(new Error('Unauthorized / Invalid query params'));
       }
 
       socket.data.user = dto;
@@ -66,7 +65,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
   }
 
-  @UsePipes(new ValidationPipe({ transform: true }))
   @SubscribeMessage(SocketEventEnum.SEND_MESSAGE)
   handleSendMessage(
     @ConnectedSocket() client: Socket,
@@ -75,12 +73,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const senderId = client.handshake.query.id as string;
     const msg = this.chatService.addMessage(senderId, body);
 
+    //TODO CHANGE TO ROOMS.
     if (msg) {
       this.server.emit(SocketEventEnum.MESSAGE_RECEIVED, msg);
     }
   }
 
-  @UsePipes(new ValidationPipe({ transform: true }))
   @SubscribeMessage(SocketEventEnum.GET_HISTORY)
   handleGetHistory(
     @ConnectedSocket() client: Socket,
