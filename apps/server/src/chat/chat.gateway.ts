@@ -59,10 +59,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   handleDisconnect(client: Socket) {
-    const userId = client.handshake.query.id as string;
+    const user: ConnectQueryDto = client.data.user;
 
-    if (userId) {
-      this.chatService.setUserOffline(userId);
+    if (user.id) {
+      this.chatService.setUserOffline(user.id);
       this.broadcastUsers();
     }
   }

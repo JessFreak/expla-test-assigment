@@ -78,7 +78,8 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   }
 
   private handleBotResponse(botId: string, targetUserId: string, text: string): void {
-    const handler = this.botHandlers[botId as BotIdEnum];
+    const handler = this.botHandlers[botId as keyof typeof this.botHandlers];
+
     if (handler) {
       handler.handle(targetUserId, text, this.sendBotMessage.bind(this));
     }
