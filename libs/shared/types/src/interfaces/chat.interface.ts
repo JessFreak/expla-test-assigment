@@ -1,3 +1,5 @@
+import { IUser } from './user.interface';
+
 export interface IConnectQuery {
   id: string;
   name: string;
@@ -11,4 +13,10 @@ export interface IGetHistory {
 export interface ISendMessage {
   receiverId: string;
   text: string;
+}
+
+export interface IChatPreview {
+  user: IUser;
+  lastMessageText: string | null;
+  lastMessageTimestamp: number | null;
 }

@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { IGetUsersQuery, UserFilterEnum } from '@shared';
+import { IGetUsersQuery, SortOrderEnum, UserFilterEnum } from '@shared';
 
 export class GetUsersQueryDto implements IGetUsersQuery {
   @IsEnum(UserFilterEnum)
@@ -9,4 +9,8 @@ export class GetUsersQueryDto implements IGetUsersQuery {
   @IsString()
   @IsOptional()
   search?: string;
+
+  @IsEnum(SortOrderEnum)
+  @IsOptional()
+  sortByDate?: SortOrderEnum = SortOrderEnum.DESC;
 }

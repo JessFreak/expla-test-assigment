@@ -1,7 +1,7 @@
 import { Component, EventEmitter, input, Output, signal } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IGetUsersQuery, IUser, UserFilterEnum, UserStatusEnum } from '@shared';
+import { IChatPreview, IGetUsersQuery, UserFilterEnum, UserStatusEnum } from '@shared';
 
 @Component({
   selector: 'app-chat-sidebar',
@@ -11,7 +11,7 @@ import { IGetUsersQuery, IUser, UserFilterEnum, UserStatusEnum } from '@shared';
   styleUrls: ['./chat-sidebar.component.scss'],
 })
 export class ChatSidebarComponent {
-  public users = input<IUser[]>([]);
+  public previews = input<IChatPreview[]>([]);
   public selectedUserId = input<string | null>(null);
 
   @Output() selectUser = new EventEmitter<string>();

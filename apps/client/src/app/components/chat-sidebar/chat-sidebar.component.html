@@ -16,30 +16,32 @@
     </div>
 
     <ul class="chat-list">
-        @for (user of users(); track user.id) {
+        @for (preview of previews(); track preview.user.id) {
             <li
                     class="chat-item"
-                    [class.active]="user.id === selectedUserId()"
-                    (click)="onSelect(user.id)"
+                    [class.active]="preview.user.id === selectedUserId()"
+                    (click)="onSelect(preview.user.id)"
             >
                 <div class="avatar-wrap">
                     <img
-                            [ngSrc]="user.avatar"
-                            [alt]="user.name"
+                            [ngSrc]="preview.user.avatar"
+                            [alt]="preview.user.name"
                             width="48"
                             height="48"
                             class="avatar"
                     />
-                    @if (user.status === UserStatusEnum.ONLINE) {
+                    @if (preview.user.status === UserStatusEnum.ONLINE) {
                         <span class="status-dot"></span>
                     }
                 </div>
 
                 <div class="info">
                     <div class="top-row">
-                        <span class="name">{{ user.name }}</span>
+                        <span class="name">{{ preview.user.name }}</span>
                     </div>
-                    <span class="subtext">{{ user.isBot ? 'Bot' : 'User' }}</span>
+                    <span class="subtext">
+                      {{ preview.lastMessageText || (preview.user.isBot ? 'Bot' : 'User') }}
+                    </span>
                 </div>
             </li>
         } @empty {

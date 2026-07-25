@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
-import { SocketEventEnum, IUser, IMessage, IGetUsersQuery } from '@shared';
+import { SocketEventEnum, IUser, IMessage, IGetUsersQuery, IChatPreview } from '@shared'; // 👈 Додали IChatPreview
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -11,9 +11,9 @@ export class ChatSocketService {
   private currentUser: IUser | null = null;
 
   public isConnected = signal<boolean>(false);
-  public activeUsers = signal<IUser[]>([]);
-  public messages = signal<IMessage[]>([]);
 
+  public chatPreviews = signal<IChatPreview[]>([]);
+  public messages = signal<IMessage[]>([]);
   public activeChatId = signal<string | null>(null);
 
   public connect(user: IUser): void {
@@ -44,8 +44,8 @@ export class ChatSocketService {
       this.isConnected.set(false);
     });
 
-    this.socket.on(SocketEventEnum.USERS_LIST, (users: IUser[]) => {
-      this.activeUsers.set(users);
+    this.socket.on(SocketEventEnum.USERS_LIST, (previews: IChatPreview[]) => {
+      this.chatPreviews.set(previews);
     });
 
     this.socket.on(SocketEventEnum.MESSAGE_RECEIVED, (message: IMessage) => {

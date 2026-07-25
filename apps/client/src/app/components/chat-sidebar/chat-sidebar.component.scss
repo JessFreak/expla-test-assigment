@@ -76,6 +76,7 @@
         position: relative;
         width: 48px;
         height: 48px;
+        flex-shrink: 0;
 
         .avatar {
           width: 100%;
@@ -99,15 +100,21 @@
       .info {
         display: flex;
         flex-direction: column;
+        flex: 1;
+        min-width: 0;
 
         .name {
-          font-size: 15px;
+          font-size: 14px;
           font-weight: 500;
           color: var(--text-main);
+          text-overflow: ellipsis;
         }
 
         .subtext {
-          font-size: 13px;
+          font-size: 12px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
           color: var(--text-muted);
         }
       }

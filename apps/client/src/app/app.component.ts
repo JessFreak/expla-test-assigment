@@ -18,10 +18,11 @@ export class AppComponent implements OnInit {
 
   public currentUser = signal<IUser | null>(null);
   public selectedUserId = signal<string | null>(null);
-  
+
   public activeContact = computed(() => {
     const id = this.selectedUserId();
-    return this.socketService.activeUsers().find((u) => u.id === id) || null;
+    const preview = this.socketService.chatPreviews().find((p) => p.user.id === id);
+    return preview ? preview.user : null;
   });
 
   ngOnInit(): void {

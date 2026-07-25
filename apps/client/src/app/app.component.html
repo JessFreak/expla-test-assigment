@@ -1,6 +1,6 @@
 <div class="app-layout">
     <app-chat-sidebar
-            [users]="socketService.activeUsers()"
+            [previews]="socketService.chatPreviews()"
             [selectedUserId]="selectedUserId()"
             (selectUser)="onSelectUser($event)"
             (filterChange)="onFilterChange($event)"

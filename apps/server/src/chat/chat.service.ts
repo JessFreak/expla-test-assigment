@@ -9,7 +9,10 @@ import {
   UserStatusEnum,
   UserFilterEnum,
   IGetUsersQuery,
-  applyFilters
+  applyFilters,
+  applySort,
+  IChatPreview,
+  SortOrderEnum
 } from '@shared';
 import { SendMessageDto } from './dtos';
 import { EchoBotHandler, IgnoreBotHandler, ReverseBotHandler, SpamBotHandler } from './bot-handlers';
@@ -44,7 +47,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     Object.values(this.botHandlers).forEach((handler) => {
       handler.start?.(
         this.sendBotMessage.bind(this),
-        this.getUsers.bind(this)
+        this.getUsers.bind(this),
       );
     });
   }
@@ -71,6 +74,30 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     );
   }
 
+  getChatPreviews(query?: IGetUsersQuery, currentUserId?: string): IChatPreview[] {
+    const filteredUsers = this.getUsers(query, currentUserId);
+
+    const previews: IChatPreview[] = filteredUsers.map((user) => {
+      const chatMessages = currentUserId ? this.getMessagesBetween(currentUserId, user.id) : [];
+      const lastMessage = chatMessages.length > 0 ? chatMessages[chatMessages.length - 1] : null;
+
+      return {
+        user,
+        lastMessageText: lastMessage?.text || null,
+        lastMessageTimestamp: lastMessage?.timestamp || null,
+      };
+    });
+
+    const isDesc = query?.sortByDate !== SortOrderEnum.ASC;
+
+    return applySort(previews, (a, b) => {
+      const timeA = a.lastMessageTimestamp || 0;
+      const timeB = b.lastMessageTimestamp || 0;
+
+      return isDesc ? timeB - timeA : timeA - timeB;
+    });
+  }
+
   addMessage(senderId: string, dto: SendMessageDto): IMessage {
     const msg: IMessage = {
       id: generateUniqueId(),
@@ -84,7 +111,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     this.handleBotResponse(dto.receiverId, senderId, dto.text);
     return msg;
   }
-  
+
   getMessagesBetween(user1Id: string, user2Id: string): IMessage[] {
     return this.messages.filter(
       (m) =>

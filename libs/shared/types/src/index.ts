@@ -7,6 +7,7 @@ export * from './enums/socket-event.enum';
 export * from './enums/user-status.enum';
 export * from './enums/bot-id.enum';
 export * from './enums/user-filter.enum';
+export * from './enums/sort-order.enum';
 
 export * from './utils/random.utils';
 export * from './utils/filter.utils';

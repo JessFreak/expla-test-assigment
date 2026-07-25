@@ -73,9 +73,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @MessageBody() body: GetUsersQueryDto,
   ) {
     const currentUserId = client.data.user.id;
-    const users = this.chatService.getUsers(body, currentUserId);
+    const previews = this.chatService.getChatPreviews(body, currentUserId);
 
-    client.emit(SocketEventEnum.USERS_LIST, users);
+    client.emit(SocketEventEnum.USERS_LIST, previews);
   }
 
   @SubscribeMessage(SocketEventEnum.SEND_MESSAGE)
@@ -108,8 +108,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.server.sockets.sockets.forEach((socket) => {
       const userId = socket.data?.user?.id;
       if (userId) {
-        const users = this.chatService.getUsers({}, userId);
-        socket.emit(SocketEventEnum.USERS_LIST, users);
+        const previews = this.chatService.getChatPreviews({}, userId);
+        socket.emit(SocketEventEnum.USERS_LIST, previews);
       }
     });
   }
