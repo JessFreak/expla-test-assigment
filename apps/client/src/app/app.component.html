@@ -1,2 +1,18 @@
-hehe
-{{bot}}
+<div>
+    <h2>Status: {{ socketService.isConnected() ? 'Connected' : 'Disconnected' }}</h2>
+
+    <h3>Users Online ({{ socketService.activeUsers().length }}):</h3>
+    <ul>
+        @for (user of socketService.activeUsers(); track user.id) {
+            <li>
+                <img [ngSrc]="user.avatar" [alt]="user.name" width="32" height="32"/>
+
+                <span>{{ user.name }}</span>
+                <small>({{ user.isBot ? 'Bot' : 'User' }})</small>
+                <span>
+                    {{ user.status }}
+                </span>
+            </li>
+        }
+    </ul>
+</div>

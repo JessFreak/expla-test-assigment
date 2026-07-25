@@ -1,7 +1,5 @@
-import { randomUUID } from 'crypto';
-
 export const generateUniqueId = (): string => {
-  return randomUUID();
+  return crypto.randomUUID();
 };
 
 export const getRandomInt = (min: number, max: number): number => {
