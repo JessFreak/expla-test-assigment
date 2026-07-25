@@ -1,0 +1,133 @@
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.chat-window {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  background: var(--bg-app);
+  overflow: hidden;
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border-input);
+
+    .avatar { border-radius: 10px; }
+
+    .name {
+      display: block;
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 125%;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+
+        &.online { background: var(--status-online); }
+      }
+    }
+  }
+
+  .messages-container {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .message-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    max-width: 65%;
+
+    &.outgoing {
+      margin-left: auto;
+
+      .bubble {
+        background: var(--bg-msg-outgoing);
+        color: var(--text-outgoing);
+        border-radius: 16px 16px 4px 16px;
+      }
+    }
+
+    &.incoming .bubble {
+      background: var(--bg-msg-incoming);
+      border-radius: 16px 16px 16px 4px;
+    }
+
+    .avatar-spacer {
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+
+      .msg-avatar { border-radius: 8px; }
+    }
+
+    .bubble {
+      padding: 10px 16px;
+      font-size: 14px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+  }
+
+  .composer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+
+    .input {
+      flex: 1;
+      border: 1px solid var(--border-input);
+      border-radius: 16px;
+      padding: 12px 18px;
+      font-size: 14px;
+      outline: none;
+      background: transparent;
+
+      &::placeholder { color: var(--text-muted); }
+      &:focus { border-color: var(--bg-msg-outgoing); }
+    }
+
+    .send-btn {
+      background: transparent;
+      border: none;
+      color: var(--bg-msg-outgoing);
+      cursor: pointer;
+      padding: 8px;
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .empty-history, .no-chat-selected {
+    margin: auto;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+}

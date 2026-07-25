@@ -8,7 +8,13 @@
 
     <main class="chat-main">
         @if (selectedUserId()) {
-            <div>Обрано юзера з ID: {{ selectedUserId() }}</div>
+            <app-chat-window
+                    [activeContact]="activeContact()"
+                    [currentUserId]="currentUser()?.id || null"
+                    [currentUserAvatar]="currentUser()?.avatar || null"
+                    [messages]="socketService.messages()"
+                    (sendMessage)="onSendMessage($event)"
+            ></app-chat-window>
         } @else {
             <div class="empty-chat-placeholder">
                 Select a chat to start messaging

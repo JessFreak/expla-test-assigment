@@ -1,0 +1,90 @@
+<section class="chat-window">
+    @if (activeContact(); as contact) {
+        <header class="header">
+            <img
+                    [ngSrc]="contact.avatar"
+                    [alt]="contact.name"
+                    width="40"
+                    height="40"
+                    class="avatar"
+            />
+            <div class="contact-info">
+                <span class="name">{{ contact.name }}</span>
+                <span class="status">
+                    <i
+                            class="status-dot"
+                            [class.online]="contact.status === UserStatusEnum.ONLINE"
+                    ></i>
+                    {{ contact.status === UserStatusEnum.ONLINE ? 'Online' : 'Offline' }}
+                </span>
+            </div>
+        </header>
+
+        <div class="messages-container">
+            @for (message of messages(); track message.id; let i = $index) {
+                @let isMine = message.senderId === currentUserId();
+                @let prevMsg = messages()[i - 1];
+                @let showAvatar = !prevMsg || prevMsg.senderId !== message.senderId;
+
+                <div class="message-row" [class.outgoing]="isMine" [class.incoming]="!isMine">
+                    @if (!isMine) {
+                        <div class="avatar-spacer">
+                            @if (showAvatar) {
+                                <img
+                                        [ngSrc]="contact.avatar"
+                                        [alt]="contact.name"
+                                        width="32"
+                                        height="32"
+                                        class="msg-avatar"
+                                />
+                            }
+                        </div>
+                    }
+
+                    <div class="bubble">
+                        {{ message.text }}
+                    </div>
+
+                    @if (isMine) {
+                        <div class="avatar-spacer">
+                            @if (showAvatar && currentUserAvatar()) {
+                                <img
+                                        [ngSrc]="currentUserAvatar()!"
+                                        alt="My avatar"
+                                        width="32"
+                                        height="32"
+                                        class="msg-avatar"
+                                />
+                            }
+                        </div>
+                    }
+                </div>
+            } @empty {
+                <div class="empty-history">
+                    No messages yet. Say hello!
+                </div>
+            }
+        </div>
+
+        <form class="composer" (ngSubmit)="send()">
+            <input
+                    type="text"
+                    class="input"
+                    placeholder="Type a message"
+                    [ngModel]="draft()"
+                    (ngModelChange)="draft.set($event)"
+                    name="draft"
+                    autocomplete="off"
+            />
+            <button type="submit" class="send-btn" [disabled]="!draft().trim()" aria-label="Send message">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 11L21 3L13 21L11 13L3 11Z" fill="currentColor" />
+                </svg>
+            </button>
+        </form>
+    } @else {
+        <div class="no-chat-selected">
+            <p>Select a chat from the sidebar to start messaging</p>
+        </div>
+    }
+</section>
