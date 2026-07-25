@@ -13,6 +13,13 @@ const SPAM_BOT_PHRASES = [
   'Subscribe!!!',
   'HIRE ME!',
   'HELLO. HERE IS MY RESUME...',
+  'For close to the same price, 5060 ti 16gb or 5070 12gb',
+  'Create with the Best AI Models',
+  '🇪🇸 В Іспанії гарячі розпродажі!',
+  'Не міг не привітати. Сам побачиш чому',
+  '🔋 EcoFlow та Bluetti',
+  '✨ Знижки до -70% у магазинах Європи та США!',
+  'help with first pc',
 ] as const;
 
 export class EchoBotHandler extends BaseBotHandler {
