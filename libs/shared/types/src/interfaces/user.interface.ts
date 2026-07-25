@@ -1,4 +1,4 @@
-import { UserStatusEnum } from '@shared';
+import { UserStatusEnum } from '../index';
 
 export interface IUser {
     id: string;
