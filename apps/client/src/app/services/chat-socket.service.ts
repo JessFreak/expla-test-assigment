@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
-import { SocketEventEnum, IUser, IMessage } from '@shared';
+import { SocketEventEnum, IUser, IMessage, IGetUsersQuery } from '@shared';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -43,8 +43,7 @@ export class ChatSocketService {
     });
 
     this.socket.on(SocketEventEnum.USERS_LIST, (users: IUser[]) => {
-      const otherUsers = users.filter((u) => u.id !== this.currentUser?.id);
-      this.activeUsers.set(otherUsers);
+      this.activeUsers.set(users);
     });
 
     this.socket.on(SocketEventEnum.MESSAGE_RECEIVED, (message: IMessage) => {
@@ -54,6 +53,10 @@ export class ChatSocketService {
     this.socket.on(SocketEventEnum.HISTORY_LIST, (history: IMessage[]) => {
       this.messages.set(history);
     });
+  }
+
+  public getUsers(query?: IGetUsersQuery): void {
+    this.socket?.emit(SocketEventEnum.GET_USERS, query ?? {});
   }
 
   public loadHistory(withUserId: string): void {

@@ -3,11 +3,12 @@
             [users]="socketService.activeUsers()"
             [selectedUserId]="selectedUserId()"
             (selectUser)="onSelectUser($event)"
+            (filterChange)="onFilterChange($event)"
     ></app-chat-sidebar>
 
     <main class="chat-main">
         @if (selectedUserId()) {
-            <div>Обрано юзера: {{ selectedUserId() }}</div>
+            <div>Обрано юзера з ID: {{ selectedUserId() }}</div>
         } @else {
             <div class="empty-chat-placeholder">
                 Select a chat to start messaging

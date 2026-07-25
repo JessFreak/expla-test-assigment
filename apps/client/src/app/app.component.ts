@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { ChatSocketService } from './services/chat-socket.service';
 import { UserService } from './services/user.service';
 import { ChatSidebarComponent } from './components/chat-sidebar/chat-sidebar.component';
+import { IGetUsersQuery } from '@shared';
 
 @Component({
   selector: 'app-root',
@@ -24,5 +25,9 @@ export class AppComponent implements OnInit {
   public onSelectUser(userId: string): void {
     this.selectedUserId.set(userId);
     this.socketService.loadHistory(userId);
+  }
+
+  public onFilterChange(query: IGetUsersQuery): void {
+    this.socketService.getUsers(query);
   }
 }

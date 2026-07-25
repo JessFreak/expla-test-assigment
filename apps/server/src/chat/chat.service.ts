@@ -1,7 +1,16 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Server } from 'socket.io';
 import { BaseBotHandler } from './base-bot-handler';
-import { BotIdEnum, IMessage, SocketEventEnum, IUser, UserStatusEnum } from '@shared';
+import {
+  BotIdEnum,
+  IMessage,
+  SocketEventEnum,
+  IUser,
+  UserStatusEnum,
+  UserFilterEnum,
+  IGetUsersQuery,
+  applyFilters
+} from '@shared';
 import { SendMessageDto } from './dtos';
 import { EchoBotHandler, IgnoreBotHandler, ReverseBotHandler, SpamBotHandler } from './bot-handlers';
 import { generateUniqueId } from '@shared';
@@ -51,8 +60,15 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  getUsers(): IUser[] {
-    return Array.from(this.users.values());
+  getUsers(query?: IGetUsersQuery, excludeUserId?: string): IUser[] {
+    const searchLower = query?.search?.toLowerCase().trim();
+
+    return applyFilters(
+      this.users.values(),
+      excludeUserId ? (user) => user.id !== excludeUserId : null,
+      query?.filter === UserFilterEnum.ONLINE ? (user) => user.status === UserStatusEnum.ONLINE : null,
+      searchLower ? (user) => user.name.toLowerCase().includes(searchLower) : null,
+    );
   }
 
   addMessage(senderId: string, dto: SendMessageDto): IMessage {

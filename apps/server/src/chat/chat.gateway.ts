@@ -11,7 +11,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { SocketEventEnum, UserStatusEnum } from '@shared';
-import { ConnectQueryDto, GetHistoryDto, SendMessageDto } from './dtos'
+import { ConnectQueryDto, GetHistoryDto, GetUsersQueryDto, SendMessageDto } from './dtos';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 
@@ -61,10 +61,21 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleDisconnect(client: Socket) {
     const user: ConnectQueryDto = client.data.user;
 
-    if (user.id) {
+    if (user?.id) {
       this.chatService.setUserOffline(user.id);
       this.broadcastUsers();
     }
+  }
+
+  @SubscribeMessage(SocketEventEnum.GET_USERS)
+  handleGetUsers(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: GetUsersQueryDto,
+  ) {
+    const currentUserId = client.data.user.id;
+    const users = this.chatService.getUsers(body, currentUserId);
+
+    client.emit(SocketEventEnum.USERS_LIST, users);
   }
 
   @SubscribeMessage(SocketEventEnum.SEND_MESSAGE)
@@ -94,6 +105,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   private broadcastUsers() {
-    this.server.emit(SocketEventEnum.USERS_LIST, this.chatService.getUsers());
+    this.server.sockets.sockets.forEach((socket) => {
+      const userId = socket.data?.user?.id;
+      if (userId) {
+        const users = this.chatService.getUsers({}, userId);
+        socket.emit(SocketEventEnum.USERS_LIST, users);
+      }
+    });
   }
 }

@@ -1,7 +1,7 @@
-import { Component, computed, EventEmitter, input, Output, signal } from '@angular/core';
+import { Component, EventEmitter, input, Output, signal } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IUser, UserStatusEnum } from '@shared';
+import { IGetUsersQuery, IUser, UserFilterEnum, UserStatusEnum } from '@shared';
 
 @Component({
   selector: 'app-chat-sidebar',
@@ -15,26 +15,29 @@ export class ChatSidebarComponent {
   public selectedUserId = input<string | null>(null);
 
   @Output() selectUser = new EventEmitter<string>();
+  @Output() filterChange = new EventEmitter<IGetUsersQuery>();
 
   public searchQuery = signal<string>('');
-  public filter = signal<'all' | 'online'>('all');
+  public filter = signal<UserFilterEnum>(UserFilterEnum.ALL);
 
   protected readonly UserStatusEnum = UserStatusEnum;
+  protected readonly UserFilterEnum = UserFilterEnum;
 
-  public filteredUsers = computed(() => {
-    const list = this.users();
-    const query = this.searchQuery().toLowerCase().trim();
-    const currentFilter = this.filter();
+  public onSearchChange(search: string): void {
+    this.searchQuery.set(search);
+    this.emitFilter();
+  }
 
-    return list.filter((user) => {
-      const matchesSearch = user.name.toLowerCase().includes(query);
-      const matchesOnline = currentFilter === 'all' || user.status === UserStatusEnum.ONLINE;
-      return matchesSearch && matchesOnline;
+  public setFilter(filter: UserFilterEnum): void {
+    this.filter.set(filter);
+    this.emitFilter();
+  }
+
+  private emitFilter(): void {
+    this.filterChange.emit({
+      filter: this.filter(),
+      search: this.searchQuery(),
     });
-  });
-
-  public setFilter(type: 'all' | 'online'): void {
-    this.filter.set(type);
   }
 
   public onSelect(userId: string): void {
