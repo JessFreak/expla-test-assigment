@@ -83,7 +83,7 @@ export class ChatSocketService {
       this.socket.disconnect();
       this.socket = null;
       this.isConnected.set(false);
-      this.activeChatId.set(null); // Очищаємо при відключенні
+      this.activeChatId.set(null);
     }
   }
 }

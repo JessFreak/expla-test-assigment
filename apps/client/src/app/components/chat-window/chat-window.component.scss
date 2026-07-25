@@ -67,13 +67,11 @@
       .bubble {
         background: var(--bg-msg-outgoing);
         color: var(--text-outgoing);
-        border-radius: 16px 16px 4px 16px;
       }
     }
 
     &.incoming .bubble {
       background: var(--bg-msg-incoming);
-      border-radius: 16px 16px 16px 4px;
     }
 
     .avatar-spacer {
@@ -89,6 +87,7 @@
       font-size: 14px;
       line-height: 1.4;
       word-break: break-word;
+      border-radius: 16px;
     }
   }
 
