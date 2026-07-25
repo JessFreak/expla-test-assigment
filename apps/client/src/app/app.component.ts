@@ -1,24 +1,28 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ChatSocketService } from './services/chat-socket.service';
-import { NgOptimizedImage } from '@angular/common';
 import { UserService } from './services/user.service';
-import { UserStatusEnum } from '@shared';
+import { ChatSidebarComponent } from './components/chat-sidebar/chat-sidebar.component';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
-  imports: [
-    NgOptimizedImage,
-  ]
+  styleUrl: './app.component.scss',
+  imports: [ChatSidebarComponent],
 })
 export class AppComponent implements OnInit {
   private readonly userService = inject(UserService);
   protected readonly socketService = inject(ChatSocketService);
-  protected readonly UserStatusEnum = UserStatusEnum;
+  
+  public selectedUserId = signal<string | null>(null);
 
   ngOnInit(): void {
     const user = this.userService.getOrCreateProfile();
     this.socketService.connect(user);
+  }
+
+  public onSelectUser(userId: string): void {
+    this.selectedUserId.set(userId);
+    this.socketService.loadHistory(userId);
   }
 }

@@ -1,0 +1,19 @@
+.app-layout {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-app);
+}
+
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .empty-chat-placeholder {
+    margin: auto;
+    color: #94a3b8;
+  }
+}

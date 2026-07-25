@@ -35,12 +35,10 @@ export class ChatSocketService {
     if (!this.socket) return;
 
     this.socket.on('connect', () => {
-      console.log('Connected to WebSocket server');
       this.isConnected.set(true);
     });
 
     this.socket.on('disconnect', () => {
-      console.warn('Disconnected from WebSocket server');
       this.isConnected.set(false);
     });
 

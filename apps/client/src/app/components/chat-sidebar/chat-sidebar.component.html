@@ -1,0 +1,66 @@
+<aside class="sidebar">
+    <header class="header">
+        <h2>Chats</h2>
+    </header>
+
+    <div class="search-box">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path opacity="0.4" d="M13.7947 12.8789L10.1271 9.21484C10.9208 8.25781 11.3587 7.02734 11.3587 5.6875C11.3587 2.57031 8.78592 0 5.66569 0C2.51808 0 0 2.57031 0 5.6875C0 8.83203 2.54545 11.375 5.66569 11.375C6.97947 11.375 8.21114 10.9375 9.19648 10.1445L12.8641 13.8086C13.001 13.9453 13.1652 14 13.3568 14C13.521 14 13.6852 13.9453 13.7947 13.8086C14.0684 13.5625 14.0684 13.1523 13.7947 12.8789ZM1.31378 5.6875C1.31378 3.28125 3.25709 1.3125 5.69306 1.3125C8.10166 1.3125 10.0723 3.28125 10.0723 5.6875C10.0723 8.12109 8.10166 10.0625 5.69306 10.0625C3.25709 10.0625 1.31378 8.12109 1.31378 5.6875Z" fill="black"/>
+        </svg>
+        <input
+                type="text"
+                placeholder="Search chats"
+                [ngModel]="searchQuery()"
+                (ngModelChange)="searchQuery.set($event)"
+        />
+    </div>
+
+    <ul class="chat-list">
+        @for (user of filteredUsers(); track user.id) {
+            <li
+                    class="chat-item"
+                    [class.active]="user.id === selectedUserId()"
+                    (click)="onSelect(user.id)"
+            >
+                <div class="avatar-wrap">
+                    <img
+                            [ngSrc]="user.avatar"
+                            [alt]="user.name"
+                            width="48"
+                            height="48"
+                            class="avatar"
+                    />
+                    @if (user.status === UserStatusEnum.ONLINE) {
+                        <span class="status-dot"></span>
+                    }
+                </div>
+
+                <div class="info">
+                    <div class="top-row">
+                        <span class="name">{{ user.name }}</span>
+                    </div>
+                    <span class="subtext">{{ user.isBot ? 'Bot' : 'User' }}</span>
+                </div>
+            </li>
+        } @empty {
+            <li class="empty-state">No users found</li>
+        }
+    </ul>
+
+    <div class="tabs">
+        <button
+                class="tab-btn"
+                [class.active]="filter() === 'all'"
+                (click)="setFilter('all')"
+        >
+            All users
+        </button>
+        <button
+                class="tab-btn"
+                [class.active]="filter() === 'online'"
+                (click)="setFilter('online')"
+        >
+            Online users
+        </button>
+    </div>
+</aside>
