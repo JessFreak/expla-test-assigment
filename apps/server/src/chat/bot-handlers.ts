@@ -21,7 +21,9 @@ export class EchoBotHandler extends BaseBotHandler {
   }
 
   handle(targetUserId: string, text: string, sendCallback: SendBotMessageCallback): void {
-    sendCallback(this.profile.id, targetUserId, text);
+    setTimeout(() => {
+      sendCallback(this.profile.id, targetUserId, text);
+    }, 0);
   }
 }
 
