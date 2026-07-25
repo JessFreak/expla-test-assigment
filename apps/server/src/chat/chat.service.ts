@@ -140,6 +140,9 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
 
     if (this.server) {
       this.server.to(receiverId).emit(SocketEventEnum.MESSAGE_RECEIVED, msg);
+      
+      const updatedPreviews = this.getChatPreviews({}, receiverId);
+      this.server.to(receiverId).emit(SocketEventEnum.USERS_LIST, updatedPreviews);
     }
   }
 }

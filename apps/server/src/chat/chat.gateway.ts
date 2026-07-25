@@ -90,6 +90,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.server
         .to([msg.receiverId, msg.senderId])
         .emit(SocketEventEnum.MESSAGE_RECEIVED, msg);
+
+      const senderPreviews = this.chatService.getChatPreviews({}, senderId);
+      client.emit(SocketEventEnum.USERS_LIST, senderPreviews);
+
+      const receiverPreviews = this.chatService.getChatPreviews({}, msg.receiverId);
+      this.server.to(msg.receiverId).emit(SocketEventEnum.USERS_LIST, receiverPreviews);
     }
   }
 
