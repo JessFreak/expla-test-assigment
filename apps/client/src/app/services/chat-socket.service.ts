@@ -14,6 +14,8 @@ export class ChatSocketService {
   public activeUsers = signal<IUser[]>([]);
   public messages = signal<IMessage[]>([]);
 
+  public activeChatId = signal<string | null>(null);
+
   public connect(user: IUser): void {
     if (this.socket?.connected) return;
 
@@ -47,7 +49,15 @@ export class ChatSocketService {
     });
 
     this.socket.on(SocketEventEnum.MESSAGE_RECEIVED, (message: IMessage) => {
-      this.messages.update((prev) => [...prev, message]);
+      const currentChatId = this.activeChatId();
+
+      const isMessageForCurrentChat =
+        message.senderId === currentChatId ||
+        message.receiverId === currentChatId;
+
+      if (isMessageForCurrentChat) {
+        this.messages.update((prev) => [...prev, message]);
+      }
     });
 
     this.socket.on(SocketEventEnum.HISTORY_LIST, (history: IMessage[]) => {
@@ -60,6 +70,7 @@ export class ChatSocketService {
   }
 
   public loadHistory(withUserId: string): void {
+    this.activeChatId.set(withUserId);
     this.socket?.emit(SocketEventEnum.GET_HISTORY, { withUserId });
   }
 
@@ -72,6 +83,7 @@ export class ChatSocketService {
       this.socket.disconnect();
       this.socket = null;
       this.isConnected.set(false);
+      this.activeChatId.set(null); // Очищаємо при відключенні
     }
   }
 }
