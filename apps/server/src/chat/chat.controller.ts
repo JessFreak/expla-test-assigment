@@ -16,15 +16,19 @@ export class ChatController {
   getChatPreviews(
     @Query() query: GetUsersQueryDto,
     @Headers('x-user-id') currentUserId: string,
-  ): IChatPreview[] {
-    return this.chatService.getChatPreviews(query, currentUserId);
+  ): { previews: IChatPreview[] } {
+    return {
+      previews: this.chatService.getChatPreviews(query, currentUserId),
+    };
   }
 
   @Get('history/:withUserId')
   getHistory(
     @Param('withUserId') withUserId: string,
     @Headers('x-user-id') currentUserId: string,
-  ): IMessage[] {
-    return this.chatService.getMessagesBetween(currentUserId, withUserId);
+  ): { messages: IMessage[] } {
+    return {
+      messages: this.chatService.getMessagesBetween(currentUserId, withUserId),
+    };
   }
 }
