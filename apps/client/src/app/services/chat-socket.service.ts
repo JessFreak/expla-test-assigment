@@ -1,17 +1,14 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
 import { io, Socket } from 'socket.io-client';
 import { SocketEventEnum, IUser, IMessage, IGetUsersQuery, IChatPreview } from '@shared';
 import { environment } from '../../environments/environment';
-import { UserService } from './user.service';
+import { ChatApiService } from './chat-api.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatSocketService {
-  private http = inject(HttpClient);
-  private userService = inject(UserService);
-
+  private chatApiService = inject(ChatApiService);
   private socket: Socket | null = null;
 
   public isConnected = signal<boolean>(false);
@@ -63,31 +60,18 @@ export class ChatSocketService {
   }
 
   public getUsers(query?: IGetUsersQuery): void {
-    const userId = this.userService.currentUser().id;
-
-    let params = new HttpParams();
-    if (query?.search) params = params.set('search', query.search);
-    if (query?.filter) params = params.set('filter', query.filter);
-    if (query?.sortByDate) params = params.set('sortByDate', query.sortByDate);
-
-    this.http.get<IChatPreview[]>(`${environment.apiUrl}/api/chat/previews`, {
-      params,
-      headers: { 'x-user-id': userId }
-    }).subscribe({
+    this.chatApiService.getChatPreviews(query).subscribe({
       next: (previews) => this.chatPreviews.set(previews),
-      error: (err) => console.error('Failed to load chat previews', err)
+      error: (err) => console.error('Failed to load chat previews', err),
     });
   }
 
   public loadHistory(withUserId: string): void {
     this.activeChatId.set(withUserId);
-    const userId = this.userService.currentUser().id;
 
-    this.http.get<IMessage[]>(`${environment.apiUrl}/api/chat/history/${withUserId}`, {
-      headers: { 'x-user-id': userId }
-    }).subscribe({
+    this.chatApiService.getHistory(withUserId).subscribe({
       next: (history) => this.messages.set(history),
-      error: (err) => console.error('Failed to load history', err)
+      error: (err) => console.error('Failed to load history', err),
     });
   }
 
