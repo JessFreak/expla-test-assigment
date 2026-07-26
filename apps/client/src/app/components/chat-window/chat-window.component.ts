@@ -17,6 +17,7 @@ export class ChatWindowComponent {
   public messages = input<IMessage[]>([]);
 
   @Output() sendMessage = new EventEmitter<string>();
+  @Output() goBack = new EventEmitter<void>();
 
   public draft = signal<string>('');
 

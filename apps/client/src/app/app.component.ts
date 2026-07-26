@@ -46,4 +46,8 @@ export class AppComponent implements OnInit {
       this.socketService.sendMessage(receiverId, text);
     }
   }
+
+  public onBack(): void {
+    this.selectedUserId.set(null);
+  }
 }

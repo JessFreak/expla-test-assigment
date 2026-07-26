@@ -4,6 +4,30 @@
   height: 100vh;
   overflow: hidden;
   background-color: var(--bg-app);
+
+  @media (max-width: 768px) {
+    // чат відкрито -> сховати сайд бар
+    &.chat-active {
+      app-chat-sidebar {
+        display: none;
+      }
+      .chat-main {
+        display: flex;
+        width: 100%;
+      }
+    }
+
+    // чат закрито -> показати сайд бар
+    &:not(.chat-active) {
+      app-chat-sidebar {
+        display: block;
+        width: 100%;
+      }
+      .chat-main {
+        display: none;
+      }
+    }
+  }
 }
 
 .chat-main {
@@ -11,6 +35,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-width: 0;
 
   .empty-chat-placeholder {
     margin: auto;

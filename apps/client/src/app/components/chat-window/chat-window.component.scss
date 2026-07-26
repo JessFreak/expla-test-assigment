@@ -19,10 +19,21 @@
     padding: 18px 24px;
     border-bottom: 1px solid var(--border-input);
 
-    .avatar { border-radius: 10px; }
+    .back-btn {
+      display: none;
+      background: transparent;
+      border: none;
+
+      &:active {
+        background: var(--bg-active-chat);
+      }
+
+      @media (max-width: 768px) {
+        display: flex;
+      }
+    }
 
     .name {
-      display: block;
       font-size: 20px;
       font-weight: 500;
       line-height: 125%;
@@ -52,7 +63,7 @@
     padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
   }
 
   .message-row {
@@ -60,6 +71,10 @@
     align-items: flex-start;
     gap: 8px;
     max-width: 65%;
+
+    @media (max-width: 768px) {
+      max-width: 85%;
+    }
 
     &.outgoing {
       margin-left: auto;

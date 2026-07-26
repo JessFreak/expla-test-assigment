@@ -7,6 +7,12 @@
   background-color: var(--bg-sidebar);
   border-right: 1px solid var(--border-input);
 
+  @media (max-width: 768px) {
+    width: 100%;
+    min-width: 100%;
+    border-right: none;
+  }
+
   .header {
     padding: 24px 24px 20px;
     display: flex;
