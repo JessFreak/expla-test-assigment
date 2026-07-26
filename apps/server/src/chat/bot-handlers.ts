@@ -73,11 +73,9 @@ export class SpamBotHandler extends BaseBotHandler {
           (u) => !u.isBot && u.status === UserStatusEnum.ONLINE,
         );
 
-        if (activeUsers.length > 0) {
-          const randomUser = getRandomElement(activeUsers);
-          const randomPhrase = getRandomElement(SPAM_BOT_PHRASES);
-
-          sendCallback(this.profile.id, randomUser.id, randomPhrase);
+        const randomPhrase = getRandomElement(SPAM_BOT_PHRASES);
+        for (const user of activeUsers) {
+          sendCallback(this.profile.id, user.id, randomPhrase);
         }
 
         scheduleNextSpam();
