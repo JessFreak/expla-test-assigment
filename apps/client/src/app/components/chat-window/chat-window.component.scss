@@ -76,6 +76,11 @@
       max-width: 85%;
     }
 
+    &.incoming + .outgoing,
+    &.outgoing + .incoming {
+      margin-top: 22px;
+    }
+
     &.outgoing {
       margin-left: auto;
 
