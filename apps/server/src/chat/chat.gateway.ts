@@ -10,7 +10,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
-import { generateUniqueId, SocketEventEnum, UserStatusEnum } from '@shared';
+import { SocketEventEnum, UserStatusEnum } from '@shared';
 import { ConnectQueryDto, SendMessageDto } from './dtos';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
@@ -41,24 +41,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleConnection(client: Socket): void {
     const queryDto: ConnectQueryDto = client.data.user;
 
-    const isNewUser = !queryDto.id;
-    const userId = queryDto.id || generateUniqueId();
+    client.join(queryDto.id);
 
-    client.join(userId);
-
-    const userProfile = {
-      id: userId,
+    this.chatService.addUser({
+      id: queryDto.id,
       name: queryDto.name,
       avatar: queryDto.avatar,
       isBot: false,
       status: UserStatusEnum.ONLINE,
-    };
-
-    this.chatService.addUser(userProfile);
-
-    if (isNewUser) {
-      client.emit(SocketEventEnum.PROFILE_SYNC, userProfile);
-    }
+    });
 
     this.broadcastUsers();
   }
