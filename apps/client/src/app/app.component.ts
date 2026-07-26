@@ -26,9 +26,15 @@ export class AppComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    const profile = this.userService.getOrCreateProfile();
-    this.currentUser.set(profile);
-    this.socketService.connect(profile);
+    this.userService.loadProfile().subscribe({
+      next: (profile: IUser) => {
+        this.currentUser.set(profile);
+        this.socketService.connect(profile);
+
+        this.socketService.getUsers();
+      },
+      error: (err) => console.error(err),
+    });
   }
 
   public onSelectUser(userId: string): void {

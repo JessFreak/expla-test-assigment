@@ -1,11 +1,16 @@
-import { Controller, Get, Param, Query, Headers } from '@nestjs/common';
+import { Controller, Get, Param, Query, Headers, Post } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { GetUsersQueryDto } from './dtos';
-import { IChatPreview, IMessage } from '@shared';
+import { IChatPreview, IMessage, IUser } from '@shared';
 
 @Controller('chat')
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
+
+  @Post('generate-profile')
+  generateProfile(): IUser {
+    return this.chatService.generateProfile();
+  }
 
   @Get('previews')
   getChatPreviews(

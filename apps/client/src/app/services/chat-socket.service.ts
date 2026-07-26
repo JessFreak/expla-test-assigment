@@ -19,7 +19,7 @@ export class ChatSocketService {
   public connect(user: IUser): void {
     if (this.socket?.connected) return;
 
-    this.socket = io(environment.apiUrl, {
+    this.socket = io(environment.socketUrl, {
       query: {
         id: user.id,
         name: user.name,
@@ -48,12 +48,7 @@ export class ChatSocketService {
 
     this.socket.on(SocketEventEnum.MESSAGE_RECEIVED, (message: IMessage) => {
       const currentChatId = this.activeChatId();
-
-      const isMessageForCurrentChat =
-        message.senderId === currentChatId ||
-        message.receiverId === currentChatId;
-
-      if (isMessageForCurrentChat) {
+      if (message.senderId === currentChatId || message.receiverId === currentChatId) {
         this.messages.update((prev) => [...prev, message]);
       }
     });

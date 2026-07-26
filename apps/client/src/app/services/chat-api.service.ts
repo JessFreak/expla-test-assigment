@@ -13,7 +13,8 @@ export class ChatApiService {
   private readonly userService = inject(UserService);
 
   private get authHeaders() {
-    return { 'x-user-id': this.userService.currentUser().id };
+    const user = this.userService.currentUser();
+    return { 'x-user-id': user?.id ?? '' };
   }
 
   public getChatPreviews(query: IGetUsersQuery = {}): Observable<IChatPreview[]> {
@@ -21,14 +22,14 @@ export class ChatApiService {
       fromObject: query as Record<string, string>,
     });
 
-    return this.http.get<IChatPreview[]>(`${environment.apiUrl}/api/chat/previews`, {
+    return this.http.get<IChatPreview[]>(`${environment.apiUrl}/chat/previews`, {
       params,
       headers: this.authHeaders,
     });
   }
 
   public getHistory(withUserId: string): Observable<IMessage[]> {
-    return this.http.get<IMessage[]>(`${environment.apiUrl}/api/chat/history/${withUserId}`, {
+    return this.http.get<IMessage[]>(`${environment.apiUrl}/chat/history/${withUserId}`, {
       headers: this.authHeaders,
     });
   }
