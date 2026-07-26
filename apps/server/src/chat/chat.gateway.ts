@@ -26,7 +26,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   constructor(private readonly chatService: ChatService) {}
 
-  afterInit(server: Server) {
+  afterInit(server: Server): void {
     this.chatService.setServer(server);
 
     server.use(async (socket, next) => {
@@ -42,7 +42,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     });
   }
 
-  handleConnection(client: Socket) {
+  handleConnection(client: Socket): void {
     const queryDto: ConnectQueryDto = client.data.user;
 
     client.join(queryDto.id);
@@ -58,7 +58,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.broadcastUsers();
   }
 
-  handleDisconnect(client: Socket) {
+  handleDisconnect(client: Socket): void {
     const user: ConnectQueryDto = client.data.user;
 
     if (user?.id) {
@@ -71,7 +71,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleGetUsers(
     @ConnectedSocket() client: Socket,
     @MessageBody() body: GetUsersQueryDto,
-  ) {
+  ): void {
     const currentUserId = client.data.user.id;
     const previews = this.chatService.getChatPreviews(body, currentUserId);
 
@@ -82,7 +82,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleSendMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody() body: SendMessageDto,
-  ) {
+  ): void {
     const senderId = client.data.user.id;
     const msg = this.chatService.addMessage(senderId, body);
 
@@ -103,14 +103,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleGetHistory(
     @ConnectedSocket() client: Socket,
     @MessageBody() body: GetHistoryDto,
-  ) {
+  ): void {
     const senderId = client.data.user.id;
     const history = this.chatService.getMessagesBetween(senderId, body.withUserId);
 
     client.emit(SocketEventEnum.HISTORY_LIST, history);
   }
 
-  private broadcastUsers() {
+  private broadcastUsers(): void {
     this.server.sockets.sockets.forEach((socket) => {
       const userId = socket.data?.user?.id;
       if (userId) {

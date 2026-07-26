@@ -31,17 +31,17 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     [BotIdEnum.IGNORE]: new IgnoreBotHandler(),
   };
 
-  onModuleInit() {
+  onModuleInit(): void {
     Object.values(this.botHandlers).forEach((handler) => {
       this.users.set(handler.profile.id, handler.profile);
     });
   }
 
-  onModuleDestroy() {
+  onModuleDestroy(): void {
     Object.values(this.botHandlers).forEach((handler) => handler.stop?.());
   }
 
-  setServer(server: Server) {
+  setServer(server: Server): void {
     this.server = server;
 
     Object.values(this.botHandlers).forEach((handler) => {
@@ -56,7 +56,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     this.users.set(user.id, { ...user, isBot: false, status: UserStatusEnum.ONLINE });
   }
 
-  setUserOffline(userId: string) {
+  setUserOffline(userId: string): void {
     const user = this.users.get(userId);
     if (user) {
       user.status = UserStatusEnum.OFFLINE;
