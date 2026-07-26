@@ -1,16 +1,20 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { io, Socket } from 'socket.io-client';
 import { SocketEventEnum, IUser, IMessage, IGetUsersQuery, IChatPreview } from '@shared';
 import { environment } from '../../environments/environment';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatSocketService {
+  private http = inject(HttpClient);
+  private userService = inject(UserService);
+
   private socket: Socket | null = null;
 
   public isConnected = signal<boolean>(false);
-
   public chatPreviews = signal<IChatPreview[]>([]);
   public messages = signal<IMessage[]>([]);
   public activeChatId = signal<string | null>(null);
@@ -56,19 +60,35 @@ export class ChatSocketService {
         this.messages.update((prev) => [...prev, message]);
       }
     });
-
-    this.socket.on(SocketEventEnum.HISTORY_LIST, (history: IMessage[]) => {
-      this.messages.set(history);
-    });
   }
 
   public getUsers(query?: IGetUsersQuery): void {
-    this.socket?.emit(SocketEventEnum.GET_USERS, query ?? {});
+    const userId = this.userService.currentUser().id;
+
+    let params = new HttpParams();
+    if (query?.search) params = params.set('search', query.search);
+    if (query?.filter) params = params.set('filter', query.filter);
+    if (query?.sortByDate) params = params.set('sortByDate', query.sortByDate);
+
+    this.http.get<IChatPreview[]>(`${environment.apiUrl}/api/chat/previews`, {
+      params,
+      headers: { 'x-user-id': userId }
+    }).subscribe({
+      next: (previews) => this.chatPreviews.set(previews),
+      error: (err) => console.error('Failed to load chat previews', err)
+    });
   }
 
   public loadHistory(withUserId: string): void {
     this.activeChatId.set(withUserId);
-    this.socket?.emit(SocketEventEnum.GET_HISTORY, { withUserId });
+    const userId = this.userService.currentUser().id;
+
+    this.http.get<IMessage[]>(`${environment.apiUrl}/api/chat/history/${withUserId}`, {
+      headers: { 'x-user-id': userId }
+    }).subscribe({
+      next: (history) => this.messages.set(history),
+      error: (err) => console.error('Failed to load history', err)
+    });
   }
 
   public sendMessage(receiverId: string, text: string): void {

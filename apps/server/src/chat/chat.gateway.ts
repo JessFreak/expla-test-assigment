@@ -11,7 +11,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { SocketEventEnum, UserStatusEnum } from '@shared';
-import { ConnectQueryDto, GetHistoryDto, GetUsersQueryDto, SendMessageDto } from './dtos';
+import { ConnectQueryDto, SendMessageDto } from './dtos';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 
@@ -20,9 +20,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @WebSocketServer()
   server: Server;
 
-  constructor(
-    private readonly chatService: ChatService,
-  ) {}
+  constructor(private readonly chatService: ChatService) {}
 
   afterInit(server: Server): void {
     this.chatService.setServer(server);
@@ -65,17 +63,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
   }
 
-  @SubscribeMessage(SocketEventEnum.GET_USERS)
-  handleGetUsers(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() body: GetUsersQueryDto,
-  ): void {
-    const currentUserId = client.data.user.id;
-    const previews = this.chatService.getChatPreviews(body, currentUserId);
-
-    client.emit(SocketEventEnum.USERS_LIST, previews);
-  }
-
   @SubscribeMessage(SocketEventEnum.SEND_MESSAGE)
   handleSendMessage(
     @ConnectedSocket() client: Socket,
@@ -93,17 +80,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     const receiverPreviews = this.chatService.getChatPreviews({}, msg.receiverId);
     this.server.to(msg.receiverId).emit(SocketEventEnum.USERS_LIST, receiverPreviews);
-  }
-
-  @SubscribeMessage(SocketEventEnum.GET_HISTORY)
-  handleGetHistory(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() body: GetHistoryDto,
-  ): void {
-    const senderId = client.data.user.id;
-    const history = this.chatService.getMessagesBetween(senderId, body.withUserId);
-
-    client.emit(SocketEventEnum.HISTORY_LIST, history);
   }
 
   private broadcastUsers(): void {

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { generateUniqueId, getRandomElement, IUser, UserStatusEnum } from '@shared';
 import { environment } from '../../environments/environment';
 
@@ -18,7 +18,13 @@ const CHAT_TAB_KEY = 'chat_tab_id';
   providedIn: 'root',
 })
 export class UserService {
+  public readonly currentUser = signal<IUser>(this.initProfile());
+
   public getOrCreateProfile(): IUser {
+    return this.currentUser();
+  }
+
+  private initProfile(): IUser {
     let tabId = sessionStorage.getItem(CHAT_TAB_KEY);
     if (!tabId) {
       tabId = generateUniqueId();
