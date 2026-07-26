@@ -1,6 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
-import { SocketEventEnum, IUser, IMessage, IGetUsersQuery, IChatPreview } from '@shared';
+import { SocketEventEnum, IUser, IMessage, IGetUsersQuery, IChatPreview, UserStatusEnum } from '@shared';
 import { environment } from '../../environments/environment';
 import { ChatApiService } from './chat-api.service';
 
@@ -34,23 +34,46 @@ export class ChatSocketService {
   private setupListeners(): void {
     if (!this.socket) return;
 
-    this.socket.on('connect', () => {
-      this.isConnected.set(true);
-    });
-
-    this.socket.on('disconnect', () => {
-      this.isConnected.set(false);
-    });
-
-    this.socket.on(SocketEventEnum.USERS_LIST, (previews: IChatPreview[]) => {
-      this.chatPreviews.set(previews);
-    });
+    this.socket.on('connect', () => this.isConnected.set(true));
+    this.socket.on('disconnect', () => this.isConnected.set(false));
 
     this.socket.on(SocketEventEnum.MESSAGE_RECEIVED, (message: IMessage) => {
       const currentChatId = this.activeChatId();
       if (message.senderId === currentChatId || message.receiverId === currentChatId) {
         this.messages.update((prev) => [...prev, message]);
       }
+    });
+
+    this.socket.on(SocketEventEnum.USER_ONLINE, (user: IUser) => {
+      this.chatPreviews.update((previews) => {
+        const exists = previews.find((p) => p.user.id === user.id);
+        if (exists) {
+          return previews.map((p) => (p.user.id === user.id ? { ...p, user } : p));
+        }
+        return [...previews, { user, lastMessageText: null, lastMessageTimestamp: null }];
+      });
+    });
+
+    this.socket.on(SocketEventEnum.USER_OFFLINE, (userId: string) => {
+      this.chatPreviews.update((previews) =>
+        previews.map((p) =>
+          p.user.id === userId
+            ? { ...p, user: { ...p.user, status: UserStatusEnum.OFFLINE } }
+            : p
+        )
+      );
+    });
+
+    this.socket.on(SocketEventEnum.PREVIEW_UPDATED, (updatedPreview: IChatPreview) => {
+      this.chatPreviews.update((previews) => {
+        const filtered = previews.filter((p) => p.user.id !== updatedPreview.user.id);
+
+        return [updatedPreview, ...filtered].sort((a, b) => {
+          const timeA = a.lastMessageTimestamp ?? 0;
+          const timeB = b.lastMessageTimestamp ?? 0;
+          return timeB - timeA;
+        });
+      });
     });
   }
 

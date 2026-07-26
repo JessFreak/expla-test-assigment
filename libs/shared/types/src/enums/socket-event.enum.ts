@@ -1,5 +1,7 @@
 export enum SocketEventEnum {
   SEND_MESSAGE = 'sendMessage',
   MESSAGE_RECEIVED = 'messageReceived',
-  USERS_LIST = 'users',
+  USER_ONLINE = 'userOnline',
+  USER_OFFLINE = 'userOffline',
+  PREVIEW_UPDATED = 'previewUpdated',
 }

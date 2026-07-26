@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { fromEvent, of, switchMap, take } from 'rxjs';
 import { ChatSocketService } from './services/chat-socket.service';
 import { UserService } from './services/user.service';
 import { ChatSidebarComponent } from './components/chat-sidebar/chat-sidebar.component';
@@ -26,15 +27,28 @@ export class AppComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.userService.loadProfile().subscribe({
-      next: (profile: IUser) => {
-        this.currentUser.set(profile);
-        this.socketService.connect(profile);
+    this.whenActivated()
+      .pipe(switchMap(() => this.userService.loadProfile()))
+      .subscribe({
+        next: (profile: IUser) => {
+          this.currentUser.set(profile);
+          this.socketService.connect(profile);
 
-        this.socketService.getUsers();
-      },
-      error: (err) => console.error(err),
-    });
+          this.socketService.getUsers();
+        },
+        error: (err) => console.error(err),
+      });
+  }
+
+  // defers side effects (user creation) until the page is actually activated, since Chrome may prerender it first
+  private whenActivated() {
+    const isPrerendering = typeof document !== 'undefined' && (document as unknown as { prerendering?: boolean }).prerendering;
+
+    if (!isPrerendering) {
+      return of(void 0);
+    }
+
+    return fromEvent(document, 'prerenderingchange').pipe(take(1), switchMap(() => of(void 0)));
   }
 
   public onSelectUser(userId: string): void {

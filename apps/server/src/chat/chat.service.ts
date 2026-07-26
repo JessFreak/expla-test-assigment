@@ -90,7 +90,6 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     };
 
     this.addUser(profile);
-
     return profile;
   }
 
@@ -100,6 +99,10 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
 
   setUserOffline(userId: string): void {
     this.chatRepository.updateUserById(userId, { status: UserStatusEnum.OFFLINE });
+  }
+  
+  getUserById(userId: string): IUser | null {
+    return this.chatRepository.getUserById(userId);
   }
 
   getUsers(query?: IGetUsersQuery, excludeUserId?: string): IUser[] {
@@ -134,8 +137,15 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     if (this.server) {
       this.server.to(receiverId).emit(SocketEventEnum.MESSAGE_RECEIVED, msg);
 
-      const updatedPreviews = this.getChatPreviews({}, receiverId);
-      this.server.to(receiverId).emit(SocketEventEnum.USERS_LIST, updatedPreviews);
+      const botUser = this.chatRepository.getUserById(botId);
+      if (botUser) {
+        const preview: IChatPreview = {
+          user: botUser,
+          lastMessageText: msg.text,
+          lastMessageTimestamp: msg.timestamp,
+        };
+        this.server.to(receiverId).emit(SocketEventEnum.PREVIEW_UPDATED, preview);
+      }
     }
   }
 }
