@@ -3,12 +3,14 @@ import { io, Socket } from 'socket.io-client';
 import { SocketEventEnum, IUser, IMessage, IGetUsersQuery, IChatPreview } from '@shared';
 import { environment } from '../../environments/environment';
 import { ChatApiService } from './chat-api.service';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatSocketService {
   private chatApiService = inject(ChatApiService);
+  private userService = inject(UserService);
   private socket: Socket | null = null;
 
   public isConnected = signal<boolean>(false);
@@ -21,7 +23,7 @@ export class ChatSocketService {
 
     this.socket = io(environment.apiUrl, {
       query: {
-        id: user.id,
+        id: user.id || undefined,
         name: user.name,
         avatar: user.avatar,
       },
@@ -41,6 +43,10 @@ export class ChatSocketService {
     this.socket.on('disconnect', () => {
       this.isConnected.set(false);
     });
+
+    this.socket.on(SocketEventEnum.PROFILE_SYNC, (serverProfile: IUser) => {
+      this.userService.syncProfileFromServer(serverProfile);
+    })
 
     this.socket.on(SocketEventEnum.USERS_LIST, (previews: IChatPreview[]) => {
       this.chatPreviews.set(previews);

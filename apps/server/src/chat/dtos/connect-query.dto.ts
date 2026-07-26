@@ -1,9 +1,10 @@
-import { IsString, IsUrl } from 'class-validator';
+import { IsOptional, IsString, IsUrl } from 'class-validator';
 import { IConnectQuery } from '@shared';
 
 export class ConnectQueryDto implements IConnectQuery {
   @IsString()
-  id: string;
+  @IsOptional()
+  id?: string;
 
   @IsString()
   name: string;

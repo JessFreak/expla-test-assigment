@@ -24,6 +24,13 @@ export class UserService {
     return this.currentUser();
   }
 
+  public syncProfileFromServer(profile: IUser): void {
+    this.currentUser.set(profile);
+
+    const tabId = sessionStorage.getItem(CHAT_TAB_KEY);
+    localStorage.setItem(`chat_user_profile_${tabId}`, JSON.stringify(profile));
+  }
+
   private initProfile(): IUser {
     let tabId = sessionStorage.getItem(CHAT_TAB_KEY);
     if (!tabId) {
@@ -38,23 +45,18 @@ export class UserService {
       try {
         return JSON.parse(saved);
       } catch (error) {
-        console.warn(`UserService failed to parse`, error);
         localStorage.removeItem(storageKey);
       }
     }
 
-    const id = generateUniqueId();
     const randomName = `${getRandomElement(FIRST_NAMES)} ${getRandomElement(LAST_NAMES)}`;
 
-    const profile: IUser = {
-      id,
+    return {
+      id: '',
       name: randomName,
-      avatar: `${environment.dicebearApiUrl}?seed=${id}`,
+      avatar: `${environment.dicebearApiUrl}?seed=${encodeURIComponent(randomName)}`,
       isBot: false,
       status: UserStatusEnum.ONLINE,
     };
-
-    localStorage.setItem(storageKey, JSON.stringify(profile));
-    return profile;
   }
 }

@@ -1,7 +1,7 @@
 import { IUser } from './user.interface';
 
 export interface IConnectQuery {
-  id: string;
+  id?: string;
   name: string;
   avatar: string;
 }
