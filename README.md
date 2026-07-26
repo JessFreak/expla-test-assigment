@@ -51,6 +51,18 @@ cd expla-test-assigment
 npm install
 ```
 
+3. Copy `.env.example` to `.env` and fill in the values:
+```bash
+cp .env.example .env
+```
+
+| Variable          | Description                                                |
+|-------------------|------------------------------------------------------------|
+| `SERVER_PORT`     | Port the NestJS API/WebSocket server listens on            |
+| `PORT`            | Port the Angular dev server listens on                     |
+| `CLIENT_URL`      | Client origin allowed by the server's CORS config          |
+| `AVATAR_BASE_URL` | Base URL used to generate user/bot avatars (e.g. DiceBear) |
+
 ### Running the Application
 
 Run both client and server simultaneously:
