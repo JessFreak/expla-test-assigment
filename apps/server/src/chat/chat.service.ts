@@ -80,13 +80,11 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   }
 
   getUsers(query?: IGetUsersQuery, excludeUserId?: string): IUser[] {
-    const searchLower = query?.search?.toLowerCase().trim();
-
     return applyFilters(
       this.users.values(),
       excludeUserId ? (user) => user.id !== excludeUserId : null,
       query?.filter === UserFilterEnum.ONLINE ? (user) => user.status === UserStatusEnum.ONLINE : null,
-      searchLower ? (user) => user.name.toLowerCase().includes(searchLower) : null,
+      query?.search ? (user) => user.name.toLowerCase().includes(query.search) : null,
     );
   }
 

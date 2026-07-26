@@ -84,17 +84,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const senderId = client.data.user.id;
     const msg = this.chatService.addMessage(senderId, body);
 
-    if (msg) {
-      this.server
-        .to([msg.receiverId, msg.senderId])
-        .emit(SocketEventEnum.MESSAGE_RECEIVED, msg);
+    this.server
+      .to([msg.receiverId, msg.senderId])
+      .emit(SocketEventEnum.MESSAGE_RECEIVED, msg);
 
-      const senderPreviews = this.chatService.getChatPreviews({}, senderId);
-      client.emit(SocketEventEnum.USERS_LIST, senderPreviews);
+    const senderPreviews = this.chatService.getChatPreviews({}, senderId);
+    client.emit(SocketEventEnum.USERS_LIST, senderPreviews);
 
-      const receiverPreviews = this.chatService.getChatPreviews({}, msg.receiverId);
-      this.server.to(msg.receiverId).emit(SocketEventEnum.USERS_LIST, receiverPreviews);
-    }
+    const receiverPreviews = this.chatService.getChatPreviews({}, msg.receiverId);
+    this.server.to(msg.receiverId).emit(SocketEventEnum.USERS_LIST, receiverPreviews);
   }
 
   @SubscribeMessage(SocketEventEnum.GET_HISTORY)
