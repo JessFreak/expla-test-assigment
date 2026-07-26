@@ -15,16 +15,14 @@ import { ConnectQueryDto, GetHistoryDto, GetUsersQueryDto, SendMessageDto } from
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 
-@WebSocketGateway({
-  cors: {
-    origin: '*',
-  },
-})
+@WebSocketGateway()
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+  ) {}
 
   afterInit(server: Server): void {
     this.chatService.setServer(server);

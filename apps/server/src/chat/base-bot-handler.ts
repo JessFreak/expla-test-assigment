@@ -4,12 +4,13 @@ export type GetActiveUsersCallback = () => IUser[];
 
 export abstract class BaseBotHandler {
   readonly profile: IUser;
+  static avatarBaseUrl: string;
 
   protected constructor(id: string, name: string, seed: string) {
     this.profile = {
       id,
       name,
-      avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}`,
+      avatar: `${BaseBotHandler.avatarBaseUrl}?seed=${seed}`,
       isBot: true,
       status: UserStatusEnum.ONLINE,
     };

@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Server } from 'socket.io';
 import { BaseBotHandler } from './base-bot-handler';
 import {
@@ -12,44 +12,60 @@ import {
   applyFilters,
   applySort,
   IChatPreview,
-  SortOrderEnum
+  SortOrderEnum,
+  generateUniqueId,
 } from '@shared';
 import { SendMessageDto } from './dtos';
 import { EchoBotHandler, IgnoreBotHandler, ReverseBotHandler, SpamBotHandler } from './bot-handlers';
-import { generateUniqueId } from '@shared';
+import { ConfigType } from '@nestjs/config';
+import config from './../config/config';
 
 @Injectable()
 export class ChatService implements OnModuleInit, OnModuleDestroy {
   private users = new Map<string, IUser>();
   private messages: IMessage[] = [];
   private server: Server;
+  private botHandlers: Record<BotIdEnum, BaseBotHandler>;
 
-  private readonly botHandlers: Record<BotIdEnum, BaseBotHandler> = {
-    [BotIdEnum.ECHO]: new EchoBotHandler(),
-    [BotIdEnum.REVERSE]: new ReverseBotHandler(),
-    [BotIdEnum.SPAM]: new SpamBotHandler(),
-    [BotIdEnum.IGNORE]: new IgnoreBotHandler(),
-  };
+  constructor(@Inject(config.KEY) private configService: ConfigType<typeof config>) {}
 
   onModuleInit(): void {
-    Object.values(this.botHandlers).forEach((handler) => {
-      this.users.set(handler.profile.id, handler.profile);
-    });
+    this.initBots();
   }
 
   onModuleDestroy(): void {
-    Object.values(this.botHandlers).forEach((handler) => handler.stop?.());
+    if (this.botHandlers) {
+      for (const handler of Object.values(this.botHandlers)) {
+        handler.stop?.();
+      }
+    }
   }
 
   setServer(server: Server): void {
     this.server = server;
+    this.initBots();
 
-    Object.values(this.botHandlers).forEach((handler) => {
+    for (const handler of Object.values(this.botHandlers)) {
       handler.start?.(
         this.sendBotMessage.bind(this),
         this.getUsers.bind(this),
       );
-    });
+    }
+  }
+
+  private initBots(): void {
+    BaseBotHandler.avatarBaseUrl = this.configService.avatarBaseUrl;
+
+    this.botHandlers = {
+      [BotIdEnum.ECHO]: new EchoBotHandler(),
+      [BotIdEnum.REVERSE]: new ReverseBotHandler(),
+      [BotIdEnum.SPAM]: new SpamBotHandler(),
+      [BotIdEnum.IGNORE]: new IgnoreBotHandler(),
+    };
+
+    for (const handler of Object.values(this.botHandlers)) {
+      this.users.set(handler.profile.id, handler.profile);
+    }
   }
 
   addUser(user: IUser): void {
