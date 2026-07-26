@@ -43,7 +43,7 @@ A full-stack real-time messaging workspace built with Angular and NestJS, featur
 1. Clone the repository:
 ```bash
 git clone <https://github.com/JessFreak/expla-test-assigment.git>
-cd <expla-test-assigment>
+cd expla-test-assigment
 ```
 
 2. Install dependencies:
