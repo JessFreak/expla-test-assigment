@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import config from './config/config';
+import { API_GLOBAL_PREFIX } from './utils/constants';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,13 +16,12 @@ async function bootstrap() {
     credentials: true,
   });
 
-  const globalPrefix = 'api';
-  app.setGlobalPrefix(globalPrefix);
+  app.setGlobalPrefix(API_GLOBAL_PREFIX);
 
   const port = configService.serverPort;
   await app.listen(port);
 
-  console.log(`Server started on http://localhost:${port}/${globalPrefix}`);
+  console.log(`Server started on http://localhost:${port}/${API_GLOBAL_PREFIX}`);
 }
 
 bootstrap();

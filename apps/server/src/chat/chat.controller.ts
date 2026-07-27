@@ -18,7 +18,7 @@ export class ChatController {
     @Headers('x-user-id') currentUserId: string,
   ): { previews: IChatPreview[] } {
     return {
-      previews: this.chatService.getChatPreviews(query, currentUserId),
+      previews: this.chatService.getChatPreviews(currentUserId, query),
     };
   }
 

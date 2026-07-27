@@ -1,26 +1,12 @@
 import { BotIdEnum, UserStatusEnum } from '@shared';
 import { getRandomElement, getRandomInt } from '@shared';
 import { BaseBotHandler, GetActiveUsersCallback, SendBotMessageCallback } from './base-bot-handler';
-
-const REVERSE_BOT_DELAY_MS = 3_000;
-
-const SPAM_BOT_MIN_DELAY_MS = 10_000;
-const SPAM_BOT_MAX_DELAY_MS = 120_000;
-const SPAM_BOT_PHRASES = [
-  'Hi!',
-  '5800x3d for 200$!',
-  'Hello? Anyone here?',
-  'Subscribe!!!',
-  'HIRE ME!',
-  'HELLO. HERE IS MY RESUME...',
-  'For close to the same price, 5060 ti 16gb or 5070 12gb',
-  'Create with the Best AI Models',
-  '🇪🇸 В Іспанії гарячі розпродажі!',
-  'Не міг не привітати. Сам побачиш чому',
-  '🔋 EcoFlow та Bluetti',
-  '✨ Знижки до -70% у магазинах Європи та США!',
-  'help with first pc',
-] as const;
+import {
+  REVERSE_BOT_DELAY_MS,
+  SPAM_BOT_MIN_DELAY_MS,
+  SPAM_BOT_MAX_DELAY_MS,
+  SPAM_BOT_PHRASES,
+} from '../utils/constants';
 
 export class EchoBotHandler extends BaseBotHandler {
   constructor() {

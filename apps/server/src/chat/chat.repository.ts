@@ -9,6 +9,7 @@ import {
   UserFilterEnum,
   UserStatusEnum
 } from '@shared';
+import { CHAT_KEY_SEPARATOR } from '../utils/constants';
 
 @Injectable()
 export class ChatRepository {
@@ -16,7 +17,7 @@ export class ChatRepository {
   private readonly messages = new Map<string, IMessage[]>();
 
   private getChatKey(user1Id: string, user2Id: string): string {
-    return [user1Id, user2Id].sort().join('_');
+    return [user1Id, user2Id].sort().join(CHAT_KEY_SEPARATOR);
   }
 
   saveUser(user: IUser): void {
@@ -88,14 +89,11 @@ export class ChatRepository {
     return chatMessages.at(-1) ?? null;
   }
 
-  getChatPreviews(query?: IGetUsersQuery, currentUserId?: string): IChatPreview[] {
+  getChatPreviews(currentUserId: string, query?: IGetUsersQuery): IChatPreview[] {
     const filteredUsers = this.getUsers(query, currentUserId);
 
     const previews: IChatPreview[] = filteredUsers.map((user) => {
-      const lastMessage = currentUserId
-        ? this.getLastMessageBetween(currentUserId, user.id)
-        : null;
-
+      const lastMessage = this.getLastMessageBetween(currentUserId, user.id)
       return {
         user,
         lastMessageText: lastMessage?.text ?? null,

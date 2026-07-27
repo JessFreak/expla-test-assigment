@@ -14,6 +14,7 @@ import { SocketEventEnum, UserStatusEnum, IChatPreview } from '@shared';
 import { ConnectQueryDto, SendMessageDto } from './dtos';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
+import { WS_AUTH_ERROR_MESSAGE } from '../utils/constants';
 
 @WebSocketGateway()
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -30,7 +31,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       const errors = await validate(dto);
 
       if (errors.length > 0) {
-        return next(new Error('Unauthorized / Invalid query params'));
+        return next(new Error(WS_AUTH_ERROR_MESSAGE));
       }
 
       socket.data.user = dto;

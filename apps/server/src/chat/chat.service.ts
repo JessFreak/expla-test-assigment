@@ -17,16 +17,7 @@ import { SendMessageDto } from './dtos';
 import { EchoBotHandler, IgnoreBotHandler, ReverseBotHandler, SpamBotHandler } from './bot-handlers';
 import { ConfigType } from '@nestjs/config';
 import config from './../config/config';
-
-const FIRST_NAMES = [
-  'Alex', 'Jordan', 'Taylor', 'Morgan', 'Sam', 'Chris', 'Riley', 'Casey',
-  'Dakota', 'Jamie', 'Avery', 'Jesse', 'Reese', 'Rowan', 'Quinn', 'Skyler'
-] as const;
-
-const LAST_NAMES = [
-  'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis',
-  'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson'
-] as const;
+import { FIRST_NAMES, LAST_NAMES, BOT_AVATAR_STYLE, USER_AVATAR_STYLE } from '../utils/constants';
 
 @Injectable()
 export class ChatService implements OnModuleInit, OnModuleDestroy {
@@ -63,7 +54,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   }
 
   private initBots(): void {
-    BaseBotHandler.avatarBaseUrl = `${this.configService.avatarBaseUrl}/bottts/svg`;
+    BaseBotHandler.avatarBaseUrl = `${this.configService.avatarBaseUrl}/${BOT_AVATAR_STYLE}`;
 
     this.botHandlers = {
       [BotIdEnum.ECHO]: new EchoBotHandler(),
@@ -84,7 +75,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     const profile: IUser = {
       id,
       name: randomName,
-      avatar: `${this.configService.avatarBaseUrl}/avataaars/svg?seed=${id}`,
+      avatar: `${this.configService.avatarBaseUrl}/${USER_AVATAR_STYLE}?seed=${id}`,
       isBot: false,
       status: UserStatusEnum.ONLINE,
     };
@@ -109,8 +100,8 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     return this.chatRepository.getUsers(query, excludeUserId);
   }
 
-  getChatPreviews(query?: IGetUsersQuery, currentUserId?: string): IChatPreview[] {
-    return this.chatRepository.getChatPreviews(query, currentUserId);
+  getChatPreviews(currentUserId: string, query?: IGetUsersQuery, ): IChatPreview[] {
+    return this.chatRepository.getChatPreviews(currentUserId, query);
   }
 
   addMessage(senderId: string, dto: SendMessageDto): IMessage {
