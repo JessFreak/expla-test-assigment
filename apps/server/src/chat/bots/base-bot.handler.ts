@@ -1,6 +1,9 @@
 import { IUser, UserStatusEnum } from '@shared';
-export type SendBotMessageCallback = (botId: string, receiverId: string, text: string) => void;
-export type GetActiveUsersCallback = () => IUser[];
+
+export interface BotContext {
+  sendMessage(botId: string, receiverId: string, text: string): void;
+  getActiveUsers(): IUser[];
+}
 
 export abstract class BaseBotHandler {
   readonly profile: IUser;
@@ -16,16 +19,9 @@ export abstract class BaseBotHandler {
     };
   }
 
-  abstract handle(
-    targetUserId: string,
-    text: string,
-    sendCallback: SendBotMessageCallback,
-  ): void;
+  abstract handle(text: string): string | null | Promise<string | null>;
 
-  start?(
-    sendCallback: SendBotMessageCallback,
-    getUsersCallback: GetActiveUsersCallback,
-  ): void {}
+  start?(context: BotContext): void | Promise<void> {}
 
   stop?(): void {}
 }
