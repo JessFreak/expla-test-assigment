@@ -3,6 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import { SocketEventEnum, IUser, IMessage, IGetUsersQuery, IChatPreview, UserStatusEnum } from '@shared';
 import { environment } from '../../environments/environment';
 import { ChatApiService } from './chat-api.service';
+import { SOCKET_CONNECT_EVENT, SOCKET_DISCONNECT_EVENT, WEBSOCKET_TRANSPORT } from '../utils/constants';
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +26,7 @@ export class ChatSocketService {
         name: user.name,
         avatar: user.avatar,
       },
-      transports: ['websocket'],
+      transports: [WEBSOCKET_TRANSPORT],
     });
 
     this.setupListeners();
@@ -34,8 +35,8 @@ export class ChatSocketService {
   private setupListeners(): void {
     if (!this.socket) return;
 
-    this.socket.on('connect', () => this.isConnected.set(true));
-    this.socket.on('disconnect', () => this.isConnected.set(false));
+    this.socket.on(SOCKET_CONNECT_EVENT, () => this.isConnected.set(true));
+    this.socket.on(SOCKET_DISCONNECT_EVENT, () => this.isConnected.set(false));
 
     this.socket.on(SocketEventEnum.MESSAGE_RECEIVED, (message: IMessage) => {
       const currentChatId = this.activeChatId();
@@ -84,10 +85,10 @@ export class ChatSocketService {
     });
   }
 
-  public loadHistory(withUserId: string): void {
-    this.activeChatId.set(withUserId);
+  public loadHistory(userId: string): void {
+    this.activeChatId.set(userId);
 
-    this.chatApiService.getHistory(withUserId).subscribe({
+    this.chatApiService.getHistory(userId).subscribe({
       next: (history) => this.messages.set(history),
       error: (err) => console.error('Failed to load history', err),
     });

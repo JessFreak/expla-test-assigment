@@ -1,10 +1,9 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, tap } from 'rxjs';
-import { IUser, generateUniqueId } from '@shared';
+import { ChatRouteSegmentEnum, IUser, generateUniqueId } from '@shared';
 import { environment } from '../../environments/environment';
-
-const CHAT_TAB_KEY = 'chat_tab_id';
+import { CHAT_PROFILE_STORAGE_KEY_PREFIX, CHAT_TAB_STORAGE_KEY } from '../utils/constants';
 
 @Injectable({
   providedIn: 'root',
@@ -15,13 +14,13 @@ export class UserService {
   public readonly currentUser = signal<IUser | null>(null);
 
   public loadProfile(): Observable<IUser> {
-    let tabId = sessionStorage.getItem(CHAT_TAB_KEY);
+    let tabId = sessionStorage.getItem(CHAT_TAB_STORAGE_KEY);
     if (!tabId) {
       tabId = generateUniqueId();
-      sessionStorage.setItem(CHAT_TAB_KEY, tabId);
+      sessionStorage.setItem(CHAT_TAB_STORAGE_KEY, tabId);
     }
 
-    const storageKey = `chat_user_profile_${tabId}`;
+    const storageKey = `${CHAT_PROFILE_STORAGE_KEY_PREFIX}${tabId}`;
     const saved = localStorage.getItem(storageKey);
 
     if (saved) {
@@ -35,11 +34,13 @@ export class UserService {
       }
     }
 
-    return this.http.post<IUser>(`${environment.apiUrl}/chat/generate-profile`, {}).pipe(
-      tap((profile) => {
-        localStorage.setItem(storageKey, JSON.stringify(profile));
-        this.currentUser.set(profile);
-      })
-    );
+    return this.http
+      .post<IUser>(`${environment.apiUrl}/${ChatRouteSegmentEnum.BASE}/${ChatRouteSegmentEnum.GENERATE_PROFILE}`, {})
+      .pipe(
+        tap((profile) => {
+          localStorage.setItem(storageKey, JSON.stringify(profile));
+          this.currentUser.set(profile);
+        })
+      );
   }
 }

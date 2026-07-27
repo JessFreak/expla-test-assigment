@@ -1,5 +1,5 @@
 import { BadRequestException, createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { USER_ID_HEADER } from './constants';
+import { USER_ID_HEADER } from '@shared';
 
 export const CurrentUserId = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): string => {

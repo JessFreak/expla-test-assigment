@@ -10,8 +10,6 @@ export const LAST_NAMES = [
 
 export const API_GLOBAL_PREFIX = 'api';
 
-export const USER_ID_HEADER = 'x-user-id';
-
 export const WS_AUTH_ERROR_MESSAGE = 'Unauthorized / Invalid query params';
 
 export const CHAT_KEY_SEPARATOR = '_';

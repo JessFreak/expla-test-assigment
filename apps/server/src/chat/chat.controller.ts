@@ -1,19 +1,19 @@
 import { Controller, Get, Param, Query, Post } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { GetUsersQueryDto } from './dtos';
-import { IChatPreview, IMessage, IUser } from '@shared';
+import { ChatRouteSegmentEnum, IChatPreview, IMessage, IUser } from '@shared';
 import { CurrentUserId } from '../utils/current-user-id.decorator';
 
-@Controller('chat')
+@Controller(ChatRouteSegmentEnum.BASE)
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
-  @Post('generate-profile')
+  @Post(ChatRouteSegmentEnum.GENERATE_PROFILE)
   generateProfile(): IUser {
     return this.chatService.generateProfile();
   }
 
-  @Get('previews')
+  @Get(ChatRouteSegmentEnum.PREVIEWS)
   getChatPreviews(
     @Query() query: GetUsersQueryDto,
     @CurrentUserId() currentUserId: string,
@@ -23,13 +23,13 @@ export class ChatController {
     };
   }
 
-  @Get('history/:withUserId')
+  @Get(`${ChatRouteSegmentEnum.HISTORY}/:userId`)
   getHistory(
-    @Param('withUserId') withUserId: string,
+    @Param('userId') userId: string,
     @CurrentUserId() currentUserId: string,
   ): { messages: IMessage[] } {
     return {
-      messages: this.chatService.getMessagesBetween(currentUserId, withUserId),
+      messages: this.chatService.getMessagesBetween(currentUserId, userId),
     };
   }
 }

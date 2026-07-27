@@ -1,18 +1,5 @@
 import { ChangeDetectorRef, inject, OnDestroy, Pipe, PipeTransform } from '@angular/core';
-
-interface TimeInterval {
-  label: string;
-  seconds: number;
-}
-
-const TIME_INTERVALS: TimeInterval[] = [
-  { label: 'm', seconds: 2_592_000 },
-  { label: 'd', seconds: 86_400 },
-  { label: 'h', seconds: 3_600 },
-  { label: 'm', seconds: 60 },
-] as const;
-
-const UPDATE_INTERVAL_MS = 60_000;
+import { TIME_AGO_UPDATE_INTERVAL_MS, TIME_INTERVALS } from '../utils/constants';
 
 @Pipe({
   name: 'timeAgo',
@@ -44,7 +31,7 @@ export class TimeAgoPipe implements PipeTransform, OnDestroy {
 
     this.timerId = window.setInterval(() => {
       this.cdr.markForCheck();
-    }, UPDATE_INTERVAL_MS);
+    }, TIME_AGO_UPDATE_INTERVAL_MS);
   }
 
   ngOnDestroy(): void {
