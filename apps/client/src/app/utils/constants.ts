@@ -4,6 +4,8 @@ export const CHAT_PROFILE_STORAGE_KEY_PREFIX = 'chat_user_profile_';
 export const WEBSOCKET_TRANSPORT = 'websocket';
 export const SOCKET_CONNECT_EVENT = 'connect';
 export const SOCKET_DISCONNECT_EVENT = 'disconnect';
+export const SOCKET_CONNECT_ERROR_EVENT = 'connect_error';
+export const SOCKET_EXCEPTION_EVENT = 'exception';
 
 export interface TimeInterval {
   label: string;

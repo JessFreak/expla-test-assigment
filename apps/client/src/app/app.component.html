@@ -1,4 +1,11 @@
 <div class="app-layout" [class.chat-active]="!!selectedUserId()">
+    @if (socketService.error(); as error) {
+        <div class="error-banner">
+            <span>{{ error }}</span>
+            <button type="button" (click)="socketService.clearError()">&times;</button>
+        </div>
+    }
+
     <app-chat-sidebar
             [previews]="socketService.chatPreviews()"
             [selectedUserId]="selectedUserId()"
@@ -10,8 +17,8 @@
         @if (selectedUserId()) {
             <app-chat-window
                     [activeContact]="activeContact()"
-                    [currentUserId]="currentUser()?.id || null"
-                    [currentUserAvatar]="currentUser()?.avatar || null"
+                    [currentUserId]="userService.currentUser()?.id || null"
+                    [currentUserAvatar]="userService.currentUser()?.avatar || null"
                     [messages]="socketService.messages()"
                     (sendMessage)="onSendMessage($event)"
                     (goBack)="onBack()"

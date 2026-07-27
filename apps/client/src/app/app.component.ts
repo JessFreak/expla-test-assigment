@@ -14,10 +14,9 @@ import { IGetUsersQuery, IUser } from '@shared';
   imports: [ChatSidebarComponent, ChatWindowComponent],
 })
 export class AppComponent implements OnInit {
-  private readonly userService = inject(UserService);
+  protected readonly userService = inject(UserService);
   protected readonly socketService = inject(ChatSocketService);
 
-  public currentUser = signal<IUser | null>(null);
   public selectedUserId = signal<string | null>(null);
 
   public activeContact = computed(() => {
@@ -31,7 +30,6 @@ export class AppComponent implements OnInit {
       .pipe(switchMap(() => this.userService.loadProfile()))
       .subscribe({
         next: (profile: IUser) => {
-          this.currentUser.set(profile);
           this.socketService.connect(profile);
 
           this.socketService.getUsers();

@@ -13,11 +13,22 @@ import { CHAT_KEY_SEPARATOR } from '../utils/constants';
 
 @Injectable()
 export class ChatRepository {
+  private static readonly NEW_USER_DEFAULTS: Pick<IUser, 'isBot' | 'status'> = {
+    isBot: false,
+    status: UserStatusEnum.ONLINE,
+  };
+
   private readonly users = new Map<string, IUser>();
   private readonly messages = new Map<string, IMessage[]>();
 
   private getChatKey(user1Id: string, user2Id: string): string {
     return [user1Id, user2Id].sort().join(CHAT_KEY_SEPARATOR);
+  }
+
+  createUser(profile: Pick<IUser, 'id' | 'name' | 'avatar'>): IUser {
+    const user: IUser = { ...profile, ...ChatRepository.NEW_USER_DEFAULTS };
+    this.saveUser(user);
+    return user;
   }
 
   saveUser(user: IUser): void {

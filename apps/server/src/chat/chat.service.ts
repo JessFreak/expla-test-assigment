@@ -71,21 +71,13 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   generateProfile(): IUser {
     const id = generateUniqueId();
     const randomName = `${getRandomElement(FIRST_NAMES)} ${getRandomElement(LAST_NAMES)}`;
+    const avatar = `${this.configService.avatarBaseUrl}/${USER_AVATAR_STYLE}?seed=${id}`;
 
-    const profile: IUser = {
-      id,
-      name: randomName,
-      avatar: `${this.configService.avatarBaseUrl}/${USER_AVATAR_STYLE}?seed=${id}`,
-      isBot: false,
-      status: UserStatusEnum.ONLINE,
-    };
-
-    this.addUser(profile);
-    return profile;
+    return this.addUser({ id, name: randomName, avatar });
   }
 
-  addUser(user: IUser): void {
-    this.chatRepository.saveUser({ ...user, isBot: false, status: UserStatusEnum.ONLINE });
+  addUser(profile: Pick<IUser, 'id' | 'name' | 'avatar'>): IUser {
+    return this.chatRepository.createUser(profile);
   }
 
   setUserOffline(userId: string): void {

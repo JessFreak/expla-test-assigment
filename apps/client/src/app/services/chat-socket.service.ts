@@ -3,7 +3,18 @@ import { io, Socket } from 'socket.io-client';
 import { SocketEventEnum, IUser, IMessage, IGetUsersQuery, IChatPreview, UserStatusEnum } from '@shared';
 import { environment } from '../../environments/environment';
 import { ChatApiService } from './chat-api.service';
-import { SOCKET_CONNECT_EVENT, SOCKET_DISCONNECT_EVENT, WEBSOCKET_TRANSPORT } from '../utils/constants';
+import {
+  SOCKET_CONNECT_ERROR_EVENT,
+  SOCKET_CONNECT_EVENT,
+  SOCKET_DISCONNECT_EVENT,
+  SOCKET_EXCEPTION_EVENT,
+  WEBSOCKET_TRANSPORT,
+} from '../utils/constants';
+
+interface WsExceptionPayload {
+  status: 'error';
+  message: string;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +27,7 @@ export class ChatSocketService {
   public chatPreviews = signal<IChatPreview[]>([]);
   public messages = signal<IMessage[]>([]);
   public activeChatId = signal<string | null>(null);
+  public error = signal<string | null>(null);
 
   public connect(user: IUser): void {
     if (this.socket?.connected) return;
@@ -37,6 +49,14 @@ export class ChatSocketService {
 
     this.socket.on(SOCKET_CONNECT_EVENT, () => this.isConnected.set(true));
     this.socket.on(SOCKET_DISCONNECT_EVENT, () => this.isConnected.set(false));
+
+    this.socket.on(SOCKET_CONNECT_ERROR_EVENT, (err: Error) => {
+      this.error.set(err.message);
+    });
+
+    this.socket.on(SOCKET_EXCEPTION_EVENT, (payload: WsExceptionPayload) => {
+      this.error.set(payload.message);
+    });
 
     this.socket.on(SocketEventEnum.MESSAGE_RECEIVED, (message: IMessage) => {
       const currentChatId = this.activeChatId();
@@ -96,6 +116,10 @@ export class ChatSocketService {
 
   public sendMessage(receiverId: string, text: string): void {
     this.socket?.emit(SocketEventEnum.SEND_MESSAGE, { receiverId, text });
+  }
+
+  public clearError(): void {
+    this.error.set(null);
   }
 
   public disconnect(): void {

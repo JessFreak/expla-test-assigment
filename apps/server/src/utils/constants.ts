@@ -11,6 +11,8 @@ export const LAST_NAMES = [
 export const API_GLOBAL_PREFIX = 'api';
 
 export const WS_AUTH_ERROR_MESSAGE = 'Unauthorized / Invalid query params';
+export const WS_RECEIVER_NOT_FOUND_ERROR_MESSAGE = 'Receiver not found';
+export const WS_SENDER_NOT_FOUND_ERROR_MESSAGE = 'Sender not found';
 
 export const CHAT_KEY_SEPARATOR = '_';
 
